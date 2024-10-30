@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مفضلتك الخاصة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+        .site-card {
+            width: 120px;
+            text-align: center;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            transition: transform 0.3s;
+        }
+        .site-card:hover {
+            transform: scale(1.1);
+        }
+        .site-card img {
+            width: 100%;
+            height: auto;
+        }
+        .site-card p {
+            padding: 10px;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .top-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .top-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #6200ea;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        .top-buttons button:hover {
+            background-color: #3700b3;
+        }
+        .add-icon {
+            font-size: 24px;
+            background-color: #6200ea;
+            color: #fff;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .add-icon:hover {
+            background-color: #3700b3;
+        }
+        .popup-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            position: relative;
+        }
+        .popup-content input {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+        }
+        .delete-button {
+            background-color: #ff5f5f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: background-color 0.3s;
+        }
+        .delete-button:hover {
+            background-color: #ff2e2e;
+        }
+        .dark-mode {
+            background-color: #1a1a1a;
+            color: #f0f2f5;
+        }
+        .dark-mode a {
+            color: #bb86fc;
+        }
+        .dark-mode .site-card {
+            background-color: #333;
+        }
+        .dark-mode .popup-content {
+            background-color: #333;
+            color: #f0f2f5;
+        }
+        .dark-mode .popup-content input {
+            background-color: #555;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="popupForm" class="popup-form" onclick="outsideClick(event)">
+        <div class="popup-content">
+            <h2>أضف موقعاً جديداً</h2>
+            <input type="text" id="popupSiteName" placeholder="اسم الموقع" required>
+            <input type="url" id="popupSiteURL" placeholder="رابط الموقع" required>
+            <button onclick="addSiteFromPopup()">إضافة الموقع</button>
+            <button onclick="hidePopup()">إغلاق</button>
+        </div>
+    </div>
+    <div class="top-buttons">
+        <button onclick="toggleDarkMode()">تفعيل الوضع الداكن</button>
+        <span class="add-icon" onclick="showPopup()">+</span>
+    </div>
+    <h1>مواقعك المفضلة</h1>
+    <div class="container" id="siteContainer"></div>
+    <a href="#" onclick="clearData()" style="position: fixed; bottom: 10px; left: 10px; color: rgb(79, 79, 255); text-decoration: underline;">حذف البيانات</a>
+    <script>
+        function loadSites() {
+            const sites = JSON.parse(localStorage.getItem('sites')) || [];
+            const container = document.getElementById('siteContainer');
+            container.innerHTML = '';
+            sites.forEach((site, index) => {
+                const siteCard = document.createElement('div');
+                siteCard.classList.add('site-card');
+                siteCard.innerHTML = `
+                    <a href="${site.url}" target="_blank">
+                        <img src="https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}" alt="${site.name}">
+                        <p>${site.name}</p>
+                    </a>
+                    <button onclick="deleteSite(${index})" class="delete-button"><i class="fas fa-trash"></i></button>
+                `;
+                container.appendChild(siteCard);
+            });
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        }
+
+        function showPopup() {
+            document.getElementById('popupForm').style.display = 'flex';
+        }
+
+        function hidePopup() {
+            document.getElementById('popupForm').style.display = 'none';
+        }
+
+        function outsideClick(event) {
+            if (event.target === document.getElementById('popupForm')) {
+                hidePopup();
+            }
+        }
+
+        function addSiteFromPopup() {
+            const siteName = document.getElementById('popupSiteName').value;
+            const siteURL = document.getElementById('popupSiteURL').value;
+            if (!siteName || !siteURL) return;
+
+            const sites = JSON.parse(localStorage.getItem('sites')) || [];
+            sites.push({ name: siteName, url: siteURL });
+            localStorage.setItem('sites', JSON.stringify(sites));
+
+            document.getElementById('popupSiteName').value = '';
+            document.getElementById('popupSiteURL').value = '';
+            hidePopup();
+            loadSites();
+        }
+
+        function deleteSite(index) {
+            let sites = JSON.parse(localStorage.getItem('sites')) || [];
+            sites.splice(index, 1);
+            localStorage.setItem('sites', JSON.stringify(sites));
+            loadSites();
+        }
+
+        function clearData() {
+            localStorage.removeItem('sites');
+            loadSites();
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+            }
+            loadSites();
+        }
+    </script>
+</body>
+</html>
