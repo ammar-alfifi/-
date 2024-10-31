@@ -18,10 +18,9 @@
             margin: 0;
         }
         .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            padding: 20px;
+            display: grid;
+            gap: 15px;
+            padding: 15px;
         }
         .site-card {
             width: 120px;
@@ -30,14 +29,16 @@
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             background-color: white;
+            position: relative;
             transition: transform 0.3s;
         }
         .site-card:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
         .site-card img {
             width: 100%;
             height: auto;
+            loading: lazy; 
         }
         .site-card p {
             padding: 10px;
@@ -51,8 +52,9 @@
             display: flex;
             gap: 10px;
         }
+        .top-buttons select,
         .top-buttons button {
-            padding: 8px 16px;
+            padding: 6px 12px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -63,59 +65,56 @@
         .top-buttons button:hover {
             background-color: #3700b3;
         }
-        .add-icon {
-            font-size: 24px;
-            background-color: #6200ea;
-            color: #fff;
-            width: 35px;
-            height: 35px;
-            display: flex;
+        .popup-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            z-index: 1000;
         }
-        .add-icon:hover {
-            background-color: #3700b3;
-        }
-        .popup-form {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    align-items: center;
-    justify-content: center;
-    z-index: 1000; /* جعل النافذة فوق كل المحتوى */
-}
         .popup-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
-            position: relative;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.popup-content input {
+    width: 80%;
+    max-width: 250px;
+    padding: 8px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+        .icon-buttons {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+            z-index: 1;
         }
-        .popup-content input {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-        }
-        .delete-button {
-            background-color: #ff5f5f;
-            color: white;
+        .icon-buttons .icon-button {
+            background-color: rgba(255, 255, 255, 0.8);
             border: none;
-            border-radius: 4px;
+            border-radius: 50%;
             padding: 5px;
             cursor: pointer;
-            margin-top: 5px;
-            transition: background-color 0.3s;
+            color: #333;
         }
-        .delete-button:hover {
-            background-color: #ff2e2e;
+        .icon-buttons .icon-button:hover {
+            background-color: rgba(200, 200, 200, 0.8);
         }
         .dark-mode {
             background-color: #1a1a1a;
@@ -135,49 +134,6 @@
             background-color: #555;
             color: #fff;
         }
-    .container {
-    display: grid;
-    gap: 20px;
-    padding: 20px;
-}
-    .site-card {
-    position: relative;
-    text-align: center;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: white;
-    transition: transform 0.3s;
-}
-
-.icon-buttons {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    display: flex;
-    gap: 5px;
-    z-index: 1;
-}
-
-.icon-buttons .icon-button {
-    background-color: rgba(255, 255, 255, 0.8);
-    border: none;
-    border-radius: 50%;
-    padding: 5px;
-    cursor: pointer;
-    color: #333;
-}
-
-.icon-buttons .icon-button:hover {
-    background-color: rgba(200, 200, 200, 0.8);
-}
-
-/* لمنع التداخل مع الرابط */
-.site-card a {
-    position: relative;
-    z-index: 0;
-    display: block;
-}
     </style>
 </head>
 <body>
@@ -186,15 +142,18 @@
             <h2>أضف موقعاً جديداً</h2>
             <input type="text" id="popupSiteName" placeholder="اسم الموقع" required>
             <input type="url" id="popupSiteURL" placeholder="رابط الموقع" required>
-            <button onclick="addSiteFromPopup()">إضافة الموقع</button>        </div>
+            <button onclick="addSiteFromPopup()">إضافة الموقع</button>
+        </div>
     </div>
     <div class="top-buttons">
         <select onchange="changeGridColumns(this.value)">
-    <option value="2">2x1</option>
-    <option value="3">3x1</option>
-</select>
-        <button onclick="toggleDarkMode()">تفعيل الوضع الداكن</button>
-        <span class="add-icon" onclick="showPopup()">+</span>
+            <option value="2">2x1</option>
+            <option value="3">3x1</option>
+            <option value="4">4x1</option>
+            <option value="5">5x1</option>
+        </select>
+        <button id="darkModeToggle" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+        <button class="add-icon" onclick="showPopup()">+</button>
     </div>
     <h1>مواقعك المفضلة</h1>
     <div class="container" id="siteContainer"></div>
@@ -207,27 +166,27 @@
             sites.forEach((site, index) => {
                 const siteCard = document.createElement('div');
                 siteCard.classList.add('site-card');
-            siteCard.innerHTML = `
-    <div class="icon-buttons">
-        <button onclick="editImage(${index})" class="icon-button"><i class="fas fa-edit"></i></button>
-        <button onclick="deleteSite(${index})" class="icon-button"><i class="fas fa-trash"></i></button>
-    </div>
-    <a href="${site.url}" target="_blank">
-        <img src="https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}" alt="${site.name}">
-        <p>${site.name}</p>
-    </a>
-`;
+                const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
+                siteCard.innerHTML = `
+                    <div class="icon-buttons">
+                        <button onclick="document.getElementById('fileInput${index}').click()" class="icon-button"><i class="fas fa-edit"></i></button>
+                        <input type="file" id="fileInput${index}" style="display: none;" onchange="updateImage(${index}, event)">
+                        <button onclick="deleteSite(${index})" class="icon-button"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <a href="${site.url}" target="_blank">
+                        <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}">
+                        <p>${site.name}</p>
+                    </a>
+                `;
                 container.appendChild(siteCard);
             });
         }
 
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('darkMode', 'enabled');
-            } else {
-                localStorage.setItem('darkMode', 'disabled');
-            }
+            const darkModeEnabled = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', darkModeEnabled ? 'enabled' : 'disabled');
+            document.getElementById('darkModeToggle').querySelector('i').className = darkModeEnabled ? 'fas fa-sun' : 'fas fa-moon';
         }
 
         function showPopup() {
@@ -260,7 +219,7 @@
         }
 
         function deleteSite(index) {
-            let sites = JSON.parse(localStorage.getItem('sites')) || [];
+            const sites = JSON.parse(localStorage.getItem('sites')) || [];
             sites.splice(index, 1);
             localStorage.setItem('sites', JSON.stringify(sites));
             loadSites();
@@ -271,29 +230,37 @@
             loadSites();
         }
 
-        window.onload = function() {
-    const savedColumns = localStorage.getItem('gridColumns') || 2; // استرجاع أو تعيين القيمة الافتراضية
-    document.getElementById('siteContainer').style.gridTemplateColumns = `repeat(${savedColumns}, 1fr)`;
-    document.querySelector('.top-buttons select').value = savedColumns; // تعيين الخيار المختار في القائمة
+        function changeGridColumns(value) {
+            document.getElementById('siteContainer').style.gridTemplateColumns = `repeat(${value}, 1fr)`;
+            localStorage.setItem('gridColumns', value);
+        }
 
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add('dark-mode');
-    }
-    loadSites();
-}
-    function changeGridColumns(value) {
-    document.getElementById('siteContainer').style.gridTemplateColumns = `repeat(${value}, 1fr)`;
-    localStorage.setItem('gridColumns', value); // تخزين عدد الأعمدة
-}
-    function editImage(index) {
-    const newImageUrl = prompt("أدخل رابط الصورة الجديد:");
-    if (newImageUrl) {
-        let sites = JSON.parse(localStorage.getItem('sites')) || [];
-        sites[index].url = newImageUrl;
-        localStorage.setItem('sites', JSON.stringify(sites));
-        loadSites();
-    }
-}
+        function updateImage(index, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const sites = JSON.parse(localStorage.getItem('sites')) || [];
+                sites[index].image = e.target.result;
+                localStorage.setItem('sites', JSON.stringify(sites));
+                document.getElementById(`siteImage${index}`).src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        window.onload = function() {
+            const savedColumns = localStorage.getItem('gridColumns') || 2;
+            document.getElementById('siteContainer').style.gridTemplateColumns = `repeat(${savedColumns}, 1fr)`;
+            document.querySelector('.top-buttons select').value = savedColumns;
+
+            const darkModeEnabled = localStorage.getItem('darkMode') === 'enabled';
+            if (darkModeEnabled) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeToggle').querySelector('i').className = 'fas fa-sun';
+            }
+            loadSites();
+        }
     </script>
 </body>
 </html>
