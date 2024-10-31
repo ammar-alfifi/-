@@ -154,6 +154,21 @@
 .dark-mode #searchBar input[type="text"]::placeholder {
     color: #ccc;
 }
+#suggestions {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#suggestions li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#suggestions li:hover {
+    background-color: #eee;
+}
     </style>
 </head>
 <body>
@@ -180,6 +195,7 @@
                 <i class="fas fa-search" style="color: inherit;"></i>
             </button>
         </div>
+        <ul id="suggestions" style="list-style: none; padding: 0; margin: 0; background: white; position: absolute; z-index: 10;"></ul>
     </form>        
       
     <h1>مواقعك المفضلة</h1>
@@ -290,6 +306,40 @@
             }
             loadSites();
         }
+function saveSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const query = searchInput.value;
+    let searches = JSON.parse(localStorage.getItem('searches')) || [];
+    if (!searches.includes(query)) {
+        searches.push(query);
+        localStorage.setItem('searches', JSON.stringify(searches));
+    }
+}
+
+function showSuggestions() {
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsList = document.getElementById('suggestions');
+    suggestionsList.innerHTML = '';
+    const searches = JSON.parse(localStorage.getItem('searches')) || [];
+
+    searches.forEach(search => {
+        if (search.toLowerCase().includes(searchInput.value.toLowerCase())) {
+            const li = document.createElement('li');
+            li.textContent = search;
+            li.onclick = () => {
+                searchInput.value = search;
+                suggestionsList.innerHTML = '';
+            };
+            suggestionsList.appendChild(li);
+        }
+    });
+}
+
+window.addEventListener('resize', function() {
+    if (document.activeElement === document.getElementById('searchInput')) {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+});
     </script>
 </body>
 </html>
