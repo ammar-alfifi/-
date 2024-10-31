@@ -4,7 +4,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مفضلتك الخاصة</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -134,6 +133,27 @@
             background-color: #555;
             color: #fff;
         }
+#searchBar {
+    background-color: #d3d3d3;
+}
+#searchBar input[type="text"] {
+    background-color: #fff;
+    color: black;
+}
+#searchBar input[type="text"]::placeholder {
+    color: #888; 
+}
+.dark-mode #searchBar {
+    background-color: #333;
+}
+.dark-mode #searchBar input[type="text"] {
+    background-color: #555;
+    color: white; 
+}
+
+.dark-mode #searchBar input[type="text"]::placeholder {
+    color: #ccc;
+}
     </style>
 </head>
 <body>
@@ -149,12 +169,19 @@
         <select onchange="changeGridColumns(this.value)">
             <option value="2">2x1</option>
             <option value="3">3x1</option>
-            <option value="4">4x1</option>
-            <option value="5">5x1</option>
         </select>
         <button id="darkModeToggle" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
         <button class="add-icon" onclick="showPopup()">+</button>
     </div>
+    <form id="searchForm" action="https://www.google.com/search" method="get" style="margin-bottom: 20px;">
+        <div id="searchBar" style="display: flex; align-items: center; padding: 5px; border-radius: 5px; margin-bottom: 20px;">
+            <input type="text" name="q" placeholder="ابحث في Google..." required style="padding: 10px; width: 300px; border-radius: 5px; border: none; outline: none;">
+            <button type="submit" style="border: none; background: none; cursor: pointer;">
+                <i class="fas fa-search" style="color: inherit;"></i>
+            </button>
+        </div>
+    </form>        
+      
     <h1>مواقعك المفضلة</h1>
     <div class="container" id="siteContainer"></div>
     <a href="#" onclick="clearData()" style="position: fixed; bottom: 10px; left: 10px; color: rgb(79, 79, 255); text-decoration: underline;">حذف البيانات</a>
@@ -226,9 +253,11 @@
         }
 
         function clearData() {
-            localStorage.removeItem('sites');
-            loadSites();
-        }
+    if (confirm("هل أنت متأكد أنك تريد حذف جميع البيانات؟")) {
+        localStorage.removeItem('sites');
+        loadSites();
+    }
+}
 
         function changeGridColumns(value) {
             document.getElementById('siteContainer').style.gridTemplateColumns = `repeat(${value}, 1fr)`;
