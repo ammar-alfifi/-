@@ -31,7 +31,9 @@
             --placeholder-color: #ccc;
             --search-bar-bg: #333;
         }
-
+        .dark-mode a {
+            color: #ffffff;
+        }
         body {
             font-family: Arial, sans-serif;
             background-color: var(--bg-color);
@@ -49,9 +51,6 @@
             display: grid;
             gap: 15px;
             padding: 15px;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
         .site-card {
@@ -208,9 +207,9 @@
 
     <form id="searchForm" action="https://www.google.com/search" method="get">
         <div id="searchBar">
-            <input type="text" name="q" placeholder="ابحث في Google..." required>
-            <button type="submit">
-                <i class="fas fa-search"></i>
+            <input type="text" name="q" placeholder="ابحث في Google" required>
+            <button type="submit" style="border: none; background: none; cursor: pointer;">
+                <i class="fas fa-search" style="color: inherit;"></i>
             </button>
         </div>
     </form>
@@ -226,7 +225,6 @@
             gridColumns: 2
         };
 
-        // DOM Elements Cache
         const elements = {
             body: document.body,
             container: document.getElementById('siteContainer'),
@@ -238,7 +236,6 @@
             clearDataBtn: document.getElementById('clearData')
         };
 
-        // Optimized event delegation
         document.addEventListener('click', (e) => {
             const target = e.target;
             
@@ -260,7 +257,6 @@
             }
         });
 
-        // Optimized site loading with DocumentFragment
         function loadSites() {
             const fragment = document.createDocumentFragment();
             state.sites.forEach((site, index) => {
@@ -290,8 +286,6 @@
             elements.container.innerHTML = '';
             elements.container.appendChild(fragment);
         }
-
-        // Optimized dark mode toggle
         function toggleDarkMode() {
             state.darkMode = !state.darkMode;
             elements.body.classList.toggle('dark-mode', state.darkMode);
@@ -343,7 +337,6 @@
             reader.readAsDataURL(file);
         }
 
-        // Event Listeners
         elements.gridSelect.addEventListener('change', (e) => {
             state.gridColumns = e.target.value;
             elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
@@ -361,14 +354,11 @@
             }
         });
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Load saved data
             state.sites = JSON.parse(localStorage.getItem('sites')) || [];
             state.gridColumns = localStorage.getItem('gridColumns') || 2;
             state.darkMode = localStorage.getItem('darkMode') === 'enabled';
 
-            // Apply saved settings
             elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
             elements.gridSelect.value = state.gridColumns;
             
@@ -380,14 +370,12 @@
             loadSites();
         });
 
-        // Handle keyboard input
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && elements.popupForm.style.display === 'flex') {
                 hidePopup();
             }
         });
 
-        // Optimize for mobile keyboards
         const topButtons = document.querySelector('.top-buttons');
         let initialHeight = window.innerHeight;
 
