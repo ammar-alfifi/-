@@ -4,7 +4,7 @@
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         :root {
             --bg-color: #f0f2f5;
@@ -18,7 +18,7 @@
             --placeholder-color: #888;
             --search-bar-bg: #d3d3d3;
         }
-
+        @media (prefers-color-scheme: dark) {
         .dark-mode {
             --bg-color: #1a1a1a;
             --text-color: #f0f2f5;
@@ -34,7 +34,9 @@
         .dark-mode a {
             color: #ffffff;
         }
+    }
         body {
+            position: relative;
             font-family: Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -48,10 +50,11 @@
         }
 
         .container {
-            display: grid;
-            gap: 15px;
-            padding: 15px;
-        }
+    display: grid;
+    gap: 15px;
+    padding: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
 
         .site-card {
             width: 120px;
@@ -63,8 +66,14 @@
             position: relative;
             transition: transform 0.2s;
             will-change: transform;
+            opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
         }
-
+        .site-card.appear {
+    opacity: 1;
+    transform: translateY(0);
+}
         .site-card:hover {
             transform: scale(1.05);
         }
@@ -81,16 +90,14 @@
             margin: 0;
             font-size: 0.9rem;
         }
-
         .top-buttons {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 10px;
-            z-index: 100;
-        }
-
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
         .top-buttons select,
         .top-buttons button,
         .popup-content button {
@@ -118,7 +125,7 @@
             background-color: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 100;
         }
 
         .popup-content {
@@ -166,7 +173,7 @@
             background-color: var(--search-bar-bg);
             padding: 5px;
             border-radius: 5px;
-            margin: 20px 0;
+            margin: 50px 0 20px 0;
             display: flex;
             align-items: center;
         }
@@ -184,18 +191,64 @@
         #searchBar input::placeholder {
             color: var(--placeholder-color);
         }
-    </style>
+        #siteContainer {
+    padding-top: 10px;
+    padding-bottom: 40px;
+}
+.stats-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: var(--search-bar-bg);
+    border-radius: 8px;
+    width: 350px;
+}
+
+.stat {
+    text-align: center;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.stat p {
+    margin: 0;
+    font-weight: bold;
+}
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.5s, transform 0.5s;
+    z-index: 100;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification.hidden {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+.top-buttons button,
+#clearData {
+    transition: transform 0.2s ease;
+}
+
+.top-buttons button:hover,
+#clearData:hover {
+    transform: scale(1.1);
+}
+ </style>
 </head>
 <body>
-    <div id="popupForm" class="popup-form">
-        <div class="popup-content">
-            <h2>أضف موقعاً جديداً</h2>
-            <input type="text" id="popupSiteName" placeholder="اسم الموقع" required>
-            <input type="url" id="popupSiteURL" placeholder="رابط الموقع" required>
-            <button onclick="addSiteFromPopup()">إضافة الموقع</button>
-        </div>
-    </div>
-
     <div class="top-buttons">
         <select id="gridSelect">
             <option value="2">2x1</option>
@@ -204,7 +257,14 @@
         <button id="darkModeToggle"><i class="fas fa-moon"></i></button>
         <button class="add-icon">+</button>
     </div>
-
+    <div id="popupForm" class="popup-form">
+        <div class="popup-content">
+            <h2>أضف موقعاً جديداً</h2>
+            <input type="text" id="popupSiteName" placeholder="اسم الموقع" required>
+            <input type="url" id="popupSiteURL" placeholder="رابط الموقع" required>
+            <button onclick="addSiteFromPopup()">إضافة الموقع</button>
+        </div>
+    </div>
     <form id="searchForm" action="https://www.google.com/search" method="get">
         <div id="searchBar">
             <input type="text" name="q" placeholder="ابحث في Google" required>
@@ -213,11 +273,24 @@
             </button>
         </div>
     </form>
-
+    <div class="stats-bar">
+        <div class="stat">
+            <p>إجمالي المواقع:</p>
+            <span id="totalSites">0</span>
+        </div>
+        <div class="stat">
+            <p>المواقع المفتوحة مؤخرًا:</p>
+            <span id="recentSites">0</span>
+        </div>
+        <div class="stat">
+            <p>الموقع الأكثر زيارة:</p>
+            <span id="mostVisitedSite">-</span>
+        </div>
+    </div>    
     <h1>مواقعك المفضلة</h1>
     <div class="container" id="siteContainer"></div>
-    <a href="#" id="clearData" style="position: fixed; bottom: 10px; left: 10px; color: var(--primary-color); text-decoration: underline;">حذف البيانات</a>
-
+    <a href="#" id="clearData" style="position: absolute; bottom: 0px; left: 10px; color: var(--primary-color); text-decoration: underline;">حذف البيانات</a>
+    <div id="notification" class="notification hidden">تم إضافة الموقع بنجاح!</div>
     <script>
         const state = {
             sites: [],
@@ -258,34 +331,42 @@
         });
 
         function loadSites() {
-            const fragment = document.createDocumentFragment();
-            state.sites.forEach((site, index) => {
-                const siteCard = document.createElement('div');
-                siteCard.className = 'site-card';
-                
-                const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
-                
-                siteCard.innerHTML = `
-                    <div class="icon-buttons">
-                        <button class="icon-button"><i class="fas fa-edit"></i></button>
-                        <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
-                        <button class="icon-button"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <a href="${site.url}" target="_blank">
-                        <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy">
-                        <p>${site.name}</p>
-                    </a>
-                `;
+    const fragment = document.createDocumentFragment();
+    state.sites.forEach((site, index) => {
+        const siteCard = document.createElement('div');
+        siteCard.className = 'site-card';
+        
+        const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
 
-                const fileInput = siteCard.querySelector(`#fileInput${index}`);
-                fileInput.addEventListener('change', (e) => updateImage(index, e), { once: true });
-                
-                fragment.appendChild(siteCard);
-            });
+        siteCard.innerHTML = `
+            <div class="icon-buttons">
+                <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
+                <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
+                <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
+            </div>
+            <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
+                <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy">
+                <p>${site.name}</p>
+            </a>
+        `;
 
-            elements.container.innerHTML = '';
-            elements.container.appendChild(fragment);
-        }
+        setTimeout(() => {
+            siteCard.classList.add('appear');
+        }, index * 100);
+
+        fragment.appendChild(siteCard);
+    });
+
+    elements.container.innerHTML = '';
+    elements.container.appendChild(fragment);
+}
+
+function incrementVisits(index) {
+    state.sites[index].visits += 1;
+    localStorage.setItem('sites', JSON.stringify(state.sites));
+    updateStats();
+}
+
         function toggleDarkMode() {
             state.darkMode = !state.darkMode;
             elements.body.classList.toggle('dark-mode', state.darkMode);
@@ -314,6 +395,8 @@
             elements.popupSiteURL.value = '';
             hidePopup();
             loadSites();
+            
+            showNotification("تم إضافة الموقع بنجاح!");
         }
 
         function deleteSite(index) {
@@ -375,17 +458,44 @@
                 hidePopup();
             }
         });
+        
+ function updateStats() {
+    const totalSites = state.sites.length;
 
-        const topButtons = document.querySelector('.top-buttons');
-        let initialHeight = window.innerHeight;
+    const recentSites = state.sites.slice(-3).map(site => 
+        site.name.length > 10 ? site.name.substring(0, 10) + '...' : site.name
+    ).join(', ') || 'لا يوجد مواقع مفتوحة مؤخرًا';
 
-        const resizeObserver = new ResizeObserver(() => {
-            requestAnimationFrame(() => {
-                topButtons.style.display = (window.innerHeight < initialHeight) ? 'none' : 'flex';
-            });
-        });
+    const mostVisitedSite = state.sites.reduce((most, site) => 
+        site.visits > (most.visits || 0) ? site : most, {}).name || '-';
+    
+    const truncatedMostVisitedSite = mostVisitedSite.length > 10 ? mostVisitedSite.substring(0, 10) + '...' : mostVisitedSite;
 
-        resizeObserver.observe(document.documentElement);
+    document.getElementById('totalSites').textContent = totalSites;
+    document.getElementById('recentSites').textContent = recentSites;
+    document.getElementById('mostVisitedSite').textContent = truncatedMostVisitedSite;
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    state.sites = JSON.parse(localStorage.getItem('sites')) || [];
+    
+    updateStats();
+    loadSites();
+});
+loadSites();
+updateStats();
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.classList.remove('hidden');
+    notification.classList.add('show');
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        notification.classList.add('hidden');
+    }, 3000);
+}
     </script>
 </body>
 </html>
