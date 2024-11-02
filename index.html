@@ -261,9 +261,11 @@
         <div class="popup-content">
             <h2>أضف موقعاً جديداً</h2>
             <input type="text" id="popupSiteName" placeholder="اسم الموقع" required>
+            <span id="nameError" class="error-message" style="display: none; color: red; font-size: 0.9em;">يرجى إدخال اسم الموقع</span>
             <input type="url" id="popupSiteURL" placeholder="رابط الموقع" required>
+            <span id="urlError" class="error-message" style="display: none; color: red; font-size: 0.9em;">يرجى إدخال رابط صحيح يبدأ بـ http:// أو https://</span>
             <button onclick="addSiteFromPopup()">إضافة الموقع</button>
-        </div>
+            </div>
     </div>
     <form id="searchForm" action="https://www.google.com/search" method="get">
         <div id="searchBar">
@@ -279,7 +281,7 @@
             <span id="totalSites">0</span>
         </div>
         <div class="stat">
-            <p>المواقع المفتوحة مؤخرًا:</p>
+            <p>المواقع المضافة مؤخرًا:</p>
             <span id="recentSites">0</span>
         </div>
         <div class="stat">
@@ -330,12 +332,17 @@
             }
         });
 
-        function loadSites() {
+ function loadSites() {
+    let sites = JSON.parse(localStorage.getItem('sites')) || [];
+    const urlPattern = /^(https?:\/\/\S+)/;
+    sites = sites.filter(site => urlPattern.test(site.url.trim()) && site.url.trim().length > 8);
+    localStorage.setItem('sites', JSON.stringify(sites));
+
     const fragment = document.createDocumentFragment();
-    state.sites.forEach((site, index) => {
+    sites.forEach((site, index) => {
         const siteCard = document.createElement('div');
         siteCard.className = 'site-card';
-        
+
         const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
 
         siteCard.innerHTML = `
@@ -382,23 +389,50 @@ function incrementVisits(index) {
             elements.popupForm.style.display = 'none';
         }
 
-        function addSiteFromPopup() {
-            const siteName = elements.popupSiteName.value.trim();
-            const siteURL = elements.popupSiteURL.value.trim();
-            
-            if (!siteName || !siteURL) return;
+function validateInputs() {
+    const nameInput = document.getElementById('popupSiteName');
+    const urlInput = document.getElementById('popupSiteURL');
+    const nameError = document.getElementById('nameError');
+    const urlError = document.getElementById('urlError');
+    let isValid = true;
 
-            state.sites.push({ name: siteName, url: siteURL });
-            localStorage.setItem('sites', JSON.stringify(state.sites));
+    if (!nameInput.value.trim()) {
+        nameError.style.display = 'block';
+        isValid = false;
+    } else {
+        nameError.style.display = 'none';
+    }
 
-            elements.popupSiteName.value = '';
-            elements.popupSiteURL.value = '';
-            hidePopup();
-            loadSites();
-            
-            showNotification("تم إضافة الموقع بنجاح!");
-        }
+    const urlPattern = /^(https?:\/\/\S+)/;
+    if (!urlPattern.test(urlInput.value.trim())) {
+        urlError.style.display = 'block';
+        urlError.textContent = 'يرجى إدخال رابط صحيح يحتوي على محتوى بعد https://';
+        isValid = false;
+    } else {
+        urlError.style.display = 'none';
+    }
 
+    return isValid;
+}
+
+function addSiteFromPopup() {
+    if (!validateInputs()) {
+        return;
+    }
+
+    const siteName = document.getElementById('popupSiteName').value;
+    const siteURL = document.getElementById('popupSiteURL').value;
+
+    const sites = JSON.parse(localStorage.getItem('sites')) || [];
+    sites.push({ name: siteName, url: siteURL });
+    localStorage.setItem('sites', JSON.stringify(sites));
+
+    document.getElementById('popupSiteName').value = '';
+    document.getElementById('popupSiteURL').value = '';
+    document.getElementById('popupForm').style.display = 'none';
+    loadSites();
+}
+    
         function deleteSite(index) {
             if (confirm('هل أنت متأكد من حذف هذا الموقع؟')) {
                 state.sites.splice(index, 1);
@@ -464,7 +498,7 @@ function incrementVisits(index) {
 
     const recentSites = state.sites.slice(-3).map(site => 
         site.name.length > 10 ? site.name.substring(0, 10) + '...' : site.name
-    ).join(', ') || 'لا يوجد مواقع مفتوحة مؤخرًا';
+    ).join(', ') || 'لا يوجد مواقع مضافة مؤخرًا';
 
     const mostVisitedSite = state.sites.reduce((most, site) => 
         site.visits > (most.visits || 0) ? site : most, {}).name || '-';
