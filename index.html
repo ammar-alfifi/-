@@ -35,7 +35,7 @@
             color: #ffffff;
         }
         body {
-            font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
@@ -48,6 +48,8 @@
         }
 
         .container {
+            content-visibility: auto;
+            contain-intrinsic-size: 0 500px;
             display: grid;
             gap: 15px;
             padding: 15px;
@@ -350,17 +352,6 @@ siteCard.innerHTML = `
     </a>
 `;
 
-        siteCard.innerHTML = `
-            <div class="icon-buttons">
-                <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
-                <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
-                <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
-            </div>
-            <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
-                <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy">
-                <p>${site.name}</p>
-            </a>
-        `;
 
         setTimeout(() => {
             siteCard.classList.add('appear');
@@ -378,16 +369,9 @@ function toggleDarkMode() {
     elements.body.classList.toggle('dark-mode', state.darkMode);
     
     localStorage.setItem('darkMode', state.darkMode ? 'enabled' : 'disabled');
+    
     elements.darkModeToggle.querySelector('i').className = state.darkMode ? 'fas fa-sun' : 'fas fa-moon';
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    state.sites = JSON.parse(localStorage.getItem('sites')) || [];
-    state.darkMode = localStorage.getItem('darkMode') === 'enabled';
-
-    if (state.darkMode) toggleDarkMode();
-    loadSites();
-});
 
 
 let saveVisitsDebounced = debounce(() => {
@@ -408,7 +392,6 @@ function debounce(func, delay) {
     };
 }
 
-
         function showPopup() {
             elements.popupForm.style.display = 'flex';
         }
@@ -416,6 +399,54 @@ function debounce(func, delay) {
         function hidePopup() {
             elements.popupForm.style.display = 'none';
         }
+
+        function addSiteFromPopup() {
+    const siteName = elements.popupSiteName.value.trim();
+    const siteURL = elements.popupSiteURL.value.trim();
+    
+    if (url) {
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            sites.push('https://' + url);
+        } else {
+            sites.push(url);
+        }
+        visits[url] = (visits[url] || 0) + 1;
+        input.value = '';
+        updateUI();
+    }
+    const newSite = { name: siteName, url: siteURL, visits: 0 };
+    state.sites.push(newSite);
+    localStorage.setItem('sites', JSON.stringify(state.sites));
+
+    addSiteCard(newSite, state.sites.length - 1);
+
+    elements.popupSiteName.value = '';
+    elements.popupSiteURL.value = '';
+    hidePopup();
+    updateStats();
+    showNotification("تم إضافة الموقع بنجاح!");
+}
+
+function addSiteCard(site, index) {
+    const siteCard = document.createElement('div');
+    siteCard.className = 'site-card';
+
+    const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
+    siteCard.innerHTML = `
+        <div class="icon-buttons">
+            <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
+            <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
+            <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
+        </div>
+        <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
+            <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy">
+            <p>${site.name}</p>
+        </a>
+    `;
+
+    elements.container.appendChild(siteCard);
+}
+
 
         function updateImage(index, event) {
             const file = event.target.files[0];
@@ -448,14 +479,20 @@ function debounce(func, delay) {
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-    state.sites = JSON.parse(localStorage.getItem('sites')) || [];
-    state.darkMode = localStorage.getItem('darkMode') === 'enabled';
-    
-    if (state.darkMode) toggleDarkMode();
-    
-    loadSites();
-});
+            state.sites = JSON.parse(localStorage.getItem('sites')) || [];
+            state.gridColumns = localStorage.getItem('gridColumns') || 2;
+            state.darkMode = localStorage.getItem('darkMode') === 'enabled';
 
+            elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
+            elements.gridSelect.value = state.gridColumns;
+            
+            if (state.darkMode) {
+                elements.body.classList.add('dark-mode');
+                elements.darkModeToggle.querySelector('i').className = 'fas fa-sun';
+            }
+
+            loadSites();
+        });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && elements.popupForm.style.display === 'flex') {
@@ -473,13 +510,14 @@ function debounce(func, delay) {
         });
 
         resizeObserver.observe(document.documentElement);
-        function updateStats() {
+        
+    function updateStats() {
     const totalSites = state.sites.length;
     const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
     const recentSearches = searchHistory.slice(-3).map(search => 
         search.length > 10 ? search.substring(0, 10) + '...' : search
-    ).join(', ') || 'لا يوجد عمليات بحث حديثة';
+    ).join(', ') || 'لا توجد عمليات بحث حديثة';
 
     const mostVisitedSite = state.sites.reduce((most, site) => 
         site.visits > (most.visits || 0) ? site : most, {}).name || '-';
@@ -500,6 +538,7 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
     }
     this.submit();
 });
+
 function showNotification(message) {
     const notification = document.getElementById('notification');
     clearTimeout(notification.timeout);
@@ -515,6 +554,7 @@ function showNotification(message) {
 }
 
 
+
 function deleteSite(index) {
     if (!confirm("هل أنت متأكد أنك تريد حذف هذا الموقع؟")) return;
     
@@ -524,46 +564,7 @@ function deleteSite(index) {
     const siteCard = document.querySelectorAll('.site-card')[index];
     siteCard.remove();
     
-    updateStats(); 
-}
-
-function addSiteFromPopup() {
-    const siteName = elements.popupSiteName.value.trim();
-    const siteURL = elements.popupSiteURL.value.trim();
-    
-    if (!siteName || !siteURL) return;
-
-    const newSite = { name: siteName, url: siteURL, visits: 0 };
-    state.sites.push(newSite);
-    localStorage.setItem('sites', JSON.stringify(state.sites));
-
-    addSiteCard(newSite, state.sites.length - 1);
-
-    elements.popupSiteName.value = '';
-    elements.popupSiteURL.value = '';
-    hidePopup();
     updateStats();
-    showNotification("تم إضافة الموقع بنجاح!");
-}
-
-function addSiteCard(site, index) {
-    const siteCard = document.createElement('div');
-    siteCard.className = 'site-card';
-
-    const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
-    siteCard.innerHTML = `
-        <div class="icon-buttons">
-            <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
-            <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
-            <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
-        </div>
-        <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
-            <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy">
-            <p>${site.name}</p>
-        </a>
-    `;
-
-    elements.container.appendChild(siteCard);
 }
 
     </script>
