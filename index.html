@@ -404,16 +404,8 @@ function debounce(func, delay) {
     const siteName = elements.popupSiteName.value.trim();
     const siteURL = elements.popupSiteURL.value.trim();
     
-    if (url) {
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            sites.push('https://' + url);
-        } else {
-            sites.push(url);
-        }
-        visits[url] = (visits[url] || 0) + 1;
-        input.value = '';
-        updateUI();
-    }
+    if (!siteName || !siteURL) return;
+            
     const newSite = { name: siteName, url: siteURL, visits: 0 };
     state.sites.push(newSite);
     localStorage.setItem('sites', JSON.stringify(state.sites));
