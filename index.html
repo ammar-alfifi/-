@@ -405,7 +405,7 @@ function debounce(func, delay) {
     const siteURL = elements.popupSiteURL.value.trim();
     
     if (!siteName || !siteURL) return;
-            
+
     const newSite = { name: siteName, url: siteURL, visits: 0 };
     state.sites.push(newSite);
     localStorage.setItem('sites', JSON.stringify(state.sites));
@@ -482,7 +482,7 @@ function addSiteCard(site, index) {
                 elements.body.classList.add('dark-mode');
                 elements.darkModeToggle.querySelector('i').className = 'fas fa-sun';
             }
-
+            updateStats();
             loadSites();
         });
 
@@ -502,8 +502,8 @@ function addSiteCard(site, index) {
         });
 
         resizeObserver.observe(document.documentElement);
-        
-    function updateStats() {
+
+        function updateStats() {
     const totalSites = state.sites.length;
     const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
@@ -511,13 +511,19 @@ function addSiteCard(site, index) {
         search.length > 10 ? search.substring(0, 10) + '...' : search
     ).join(', ') || 'لا توجد عمليات بحث حديثة';
 
-    const mostVisitedSite = state.sites.reduce((most, site) => 
-        site.visits > (most.visits || 0) ? site : most, {}).name || '-';
+    const mostVisitedSite = (state.sites.reduce((most, site) => 
+        site.visits > (most.visits || 0) ? site : most, {}).name || '-'
+    );
+
+    const truncatedMostVisitedSite = mostVisitedSite.length > 10 
+        ? mostVisitedSite.substring(0, 10) + '...' 
+        : mostVisitedSite;
 
     document.getElementById('totalSites').textContent = totalSites;
     document.getElementById('recentSites').textContent = recentSearches;
-    document.getElementById('mostVisitedSite').textContent = mostVisitedSite;
+    document.getElementById('mostVisitedSite').textContent = truncatedMostVisitedSite;
 }
+
 
 document.getElementById('searchForm').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -527,8 +533,10 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
         searchHistory.push(query);
         localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
         updateStats();
+ 
     }
     this.submit();
+    
 });
 
 function showNotification(message) {
@@ -547,9 +555,7 @@ function showNotification(message) {
 
 
 
-function deleteSite(index) {
-    if (!confirm("هل أنت متأكد أنك تريد حذف هذا الموقع؟")) return;
-    
+function deleteSite(index) {    
     state.sites.splice(index, 1);
     localStorage.setItem('sites', JSON.stringify(state.sites));
     
