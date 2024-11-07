@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
+    <link rel="manifest" href="manifest.json">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
     <meta charset="UTF-8">
@@ -259,7 +260,8 @@
             <option value="3">3x1</option>
         </select>
         <button id="darkModeToggle"><i class="fas fa-moon"></i></button>
-        <button class="add-icon">+</button>
+        <button class="add-icon"><i class="fa fa-plus"></i></button>
+        <button id="downloadApk" class="icon-button"><i class="fab fa-android"></i></button>
     </div>
 
     <form id="searchForm" action="https://www.google.com/search" method="get">
@@ -344,6 +346,7 @@ siteCard.innerHTML = `
         <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
         <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
         <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
+        <button id="addToHomeScreen" class="icon-button"><i class="fa fa-cloud-download"></i></button>
     </div>
     <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
         <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy" 
@@ -553,8 +556,6 @@ function showNotification(message) {
     }, 3000);
 }
 
-
-
 function deleteSite(index) {    
     state.sites.splice(index, 1);
     localStorage.setItem('sites', JSON.stringify(state.sites));
@@ -564,7 +565,53 @@ function deleteSite(index) {
     
     updateStats();
 }
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(() => {
+        console.log('Service Worker Registered');
+    });
+}
+let deferredPrompt;
 
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    const addBtn = document.getElementById('addToHomeScreen');
+    addBtn.style.display = 'inline-block';
+
+    addBtn.addEventListener('click', () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('المستخدم وافق على الإضافة.');
+                } else {
+                    console.log('المستخدم رفض الإضافة.');
+                }
+                deferredPrompt = null;
+            });
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const addBtn = document.getElementById('addToHomeScreen');
+    addBtn.style.display = 'none';
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const downloadBtn = document.getElementById('downloadApk');
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    if (/iPhone|windows|mac|iPad|iPod/i.test(userAgent)) {
+        downloadBtn.style.display = 'none';
+    }
+});
+
+document.getElementById('downloadApk').addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.href = '/downloads/FWeb.apk';
+    link.download = 'FWeb.apk';
+    link.click();
+});
     </script>
 </body>
 </html>
