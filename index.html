@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
     <meta charset="UTF-8">
@@ -261,7 +261,7 @@
         </select>
         <button id="darkModeToggle"><i class="fas fa-moon"></i></button>
         <button class="add-icon"><i class="fa fa-plus"></i></button>
-        <button id="downloadApk" class="icon-button"><i class="fab fa-android"></i></button>
+        <button link="https://2u.pw/keOwcs8J" class="icon-button"><i class="fab fa-android"></i></button>
     </div>
 
     <form id="searchForm" action="https://www.google.com/search" method="get">
@@ -565,34 +565,42 @@ function deleteSite(index) {
     
     updateStats();
 }
+
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').then(() => {
-        console.log('Service Worker Registered');
-    });
+    navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+            console.log('تم تسجيل Service Worker بنجاح:', registration);
+        })
+        .catch((error) => {
+            console.log('فشل في تسجيل Service Worker:', error);
+        });
 }
+
+
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
+
     deferredPrompt = e;
 
-    const addBtn = document.getElementById('addToHomeScreen');
-    addBtn.style.display = 'inline-block';
+    const addToHomeScreenBtn = document.getElementById('addToHomeScreen');
+    addToHomeScreenBtn.style.display = 'inline-block';
 
-    addBtn.addEventListener('click', () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('المستخدم وافق على الإضافة.');
-                } else {
-                    console.log('المستخدم رفض الإضافة.');
-                }
-                deferredPrompt = null;
-            });
-        }
+    addToHomeScreenBtn.addEventListener('click', () => {
+        deferredPrompt.prompt();
+        
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('تمت إضافة الموقع إلى الشاشة الرئيسية');
+            } else {
+                console.log('رفض المستخدم إضافة الموقع');
+            }
+            deferredPrompt = null;
+        });
     });
 });
+
 document.addEventListener('DOMContentLoaded', () => {
     const addBtn = document.getElementById('addToHomeScreen');
     addBtn.style.display = 'none';
@@ -606,12 +614,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-document.getElementById('downloadApk').addEventListener('click', () => {
-    const link = document.createElement('a');
-    link.href = '/downloads/FWeb.apk';
-    link.download = 'FWeb.apk';
-    link.click();
-});
     </script>
 </body>
 </html>
