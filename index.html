@@ -328,11 +328,9 @@
             }
         });
 
-        function loadSites() {
+function loadSites() {
     let sites = JSON.parse(localStorage.getItem('sites')) || [];
-    const urlPattern = /^(https?:\/\/\S+)/;
-    sites = sites.filter(site => urlPattern.test(site.url.trim()) && site.url.trim().length > 8);
-    localStorage.setItem('sites', JSON.stringify(sites));
+    localStorage.setItem('sites', JSON.stringify(sites)); // تخزين البيانات كما هي
 
     const fragment = document.createDocumentFragment();
     sites.forEach((site, index) => {
@@ -340,19 +338,18 @@
         siteCard.className = 'site-card';
 
         const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
-siteCard.innerHTML = `
-    <div class="icon-buttons">
-        <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
-        <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
-        <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
-    </div>
-    <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
-        <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy" 
-        onerror="this.onerror=null;this.src='default-image.png';">
-        <p>${site.name}</p>
-    </a>
-`;
-
+        siteCard.innerHTML = `
+            <div class="icon-buttons">
+                <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
+                <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
+                <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
+            </div>
+            <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
+                <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy" 
+                onerror="this.onerror=null;this.src='default-image.png';">
+                <p>${site.name}</p>
+            </a>
+        `;
 
         setTimeout(() => {
             siteCard.classList.add('appear');
