@@ -551,16 +551,21 @@ function showNotification(message) {
     }, 3000);
 }
 
-function deleteSite(index) {    
-    if (confirm("هل أنت متأكد أنك تريد حذف هذا الموقع؟")) {
-        state.sites.splice(index, 1);
+function deleteSite(index) {
+    if (confirm("هل أنت متأكد أنك تريد حذف هذا الموقع؟")) { 
+        const deletedSite = state.sites.splice(index, 1)[0];
+        deletedSites.push(deletedSite);
         localStorage.setItem('sites', JSON.stringify(state.sites));
 
         const siteCard = document.querySelectorAll('.site-card')[index];
         siteCard.remove();
 
+        getLastDeletedSite();
         updateStats();
     }
+}
+        function getLastDeletedSite() {
+    return deletedSites.length > 0 ? deletedSites[deletedSites.length - 1] : null;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
