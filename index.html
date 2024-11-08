@@ -328,9 +328,11 @@
             }
         });
 
-function loadSites() {
+        function loadSites() {
     let sites = JSON.parse(localStorage.getItem('sites')) || [];
-    localStorage.setItem('sites', JSON.stringify(sites)); // تخزين البيانات كما هي
+    const urlPattern = /^(https?:\/\/\S+)/;
+    sites = sites.filter(site => urlPattern.test(site.url.trim()) && site.url.trim().length > 8);
+    localStorage.setItem('sites', JSON.stringify(sites));
 
     const fragment = document.createDocumentFragment();
     sites.forEach((site, index) => {
@@ -338,18 +340,19 @@ function loadSites() {
         siteCard.className = 'site-card';
 
         const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
-        siteCard.innerHTML = `
-            <div class="icon-buttons">
-                <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
-                <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
-                <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
-            </div>
-            <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
-                <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy" 
-                onerror="this.onerror=null;this.src='default-image.png';">
-                <p>${site.name}</p>
-            </a>
-        `;
+siteCard.innerHTML = `
+    <div class="icon-buttons">
+        <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
+        <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
+        <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
+    </div>
+    <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
+        <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy" 
+        onerror="this.onerror=null;this.src='default-image.png';">
+        <p>${site.name}</p>
+    </a>
+`;
+
 
         setTimeout(() => {
             siteCard.classList.add('appear');
@@ -502,7 +505,6 @@ function addSiteCard(site, index) {
         resizeObserver.observe(document.documentElement);
 
         function updateStats() {
-     elements.container.innerHTML = ''; // إزالة جميع العناصر القديمة لتجنب تكرار الأحداث
     const totalSites = state.sites.length;
     const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
@@ -552,14 +554,14 @@ function showNotification(message) {
     }, 3000);
 }
 
-function deleteSite(index) {
-    console.log("تم استدعاء دالة الحذف للموقع رقم:", index);
-    if (confirm("هل أنت متأكد أنك تريد حذف هذا الموقع؟")) { 
-        const deletedSite = state.sites.splice(index, 1)[0]; // حذف الموقع
-        localStorage.setItem('sites', JSON.stringify(state.sites));
-        loadSites(); // إعادة تحميل المواقع
-        updateStats(); // تحديث الإحصائيات
-    }
+function deleteSite(index) {    
+    state.sites.splice(index, 1);
+    localStorage.setItem('sites', JSON.stringify(state.sites));
+    
+    const siteCard = document.querySelectorAll('.site-card')[index];
+    siteCard.remove();
+    
+    updateStats();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
