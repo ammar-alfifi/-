@@ -502,6 +502,7 @@ function addSiteCard(site, index) {
         resizeObserver.observe(document.documentElement);
 
         function updateStats() {
+     elements.container.innerHTML = ''; // إزالة جميع العناصر القديمة لتجنب تكرار الأحداث
     const totalSites = state.sites.length;
     const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
@@ -552,20 +553,13 @@ function showNotification(message) {
 }
 
 function deleteSite(index) {
+    console.log("تم استدعاء دالة الحذف للموقع رقم:", index);
     if (confirm("هل أنت متأكد أنك تريد حذف هذا الموقع؟")) { 
-        const deletedSite = state.sites.splice(index, 1)[0];
-        deletedSites.push(deletedSite);
+        const deletedSite = state.sites.splice(index, 1)[0]; // حذف الموقع
         localStorage.setItem('sites', JSON.stringify(state.sites));
-
-        const siteCard = document.querySelectorAll('.site-card')[index];
-        siteCard.remove();
-
-        getLastDeletedSite();
-        updateStats();
+        loadSites(); // إعادة تحميل المواقع
+        updateStats(); // تحديث الإحصائيات
     }
-}
-        function getLastDeletedSite() {
-    return deletedSites.length > 0 ? deletedSites[deletedSites.length - 1] : null;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
