@@ -552,13 +552,15 @@ function showNotification(message) {
 }
 
 function deleteSite(index) {    
-    state.sites.splice(index, 1);
-    localStorage.setItem('sites', JSON.stringify(state.sites));
-    
-    const siteCard = document.querySelectorAll('.site-card')[index];
-    siteCard.remove();
-    
-    updateStats();
+    if (confirm("هل أنت متأكد أنك تريد حذف هذا الموقع؟")) {
+        state.sites.splice(index, 1);
+        localStorage.setItem('sites', JSON.stringify(state.sites));
+
+        const siteCard = document.querySelectorAll('.site-card')[index];
+        siteCard.remove();
+
+        updateStats();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
