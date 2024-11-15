@@ -244,29 +244,29 @@
     </style>
 </head>
 <body>
-    <div id="popupForm" class="popup-form">
+    <div id="popupForm" class="popup-form" aria-hidden="true">
         <div class="popup-content">
             <h2>أضف موقعاً جديداً</h2>
+            <label for="popupSiteName"></label>
             <input type="text" id="popupSiteName" placeholder="اسم الموقع" required>
+            <label for="popupSiteURL"></label>
             <input type="url" id="popupSiteURL" placeholder="رابط الموقع" required>
             <button onclick="addSiteFromPopup()">إضافة الموقع</button>
         </div>
     </div>
-
     <div class="top-buttons">
-        <select id="gridSelect">
+        <select id="gridSelect" aria-label="اختيار تخطيط الشبكة">
             <option value="2">2x1</option>
             <option value="3">3x1</option>
         </select>
-        <button id="darkModeToggle"><i class="fas fa-moon"></i></button>
-        <button class="add-icon"><i class="fa fa-plus"></i></button>
-        <button id="downloadApk" onclick="downloadApk()" class="icon-button"><i class="fab fa-android"></i></button>
+        <button id="darkModeToggle" aria-label="تبديل الوضع الليلي" role="switch"><i class="fas fa-moon"></i></button>
+        <button class="add-icon" aria-label="إضافة موقع جديد"><i class="fa fa-plus"></i></button>
+        <button id="downloadApk" onclick="downloadApk()" class="icon-button" aria-label="تحميل التطبيق"><i class="fab fa-android"></i></button>
     </div>
-
-    <form id="searchForm" action="https://www.google.com/search" method="get">
+    <form id="searchForm" action="https://www.google.com/search" method="get" aria-label="شريط البحث">
         <div id="searchBar">
-            <input type="text" name="q" placeholder="ابحث في Google" required>
-            <button type="submit" style="border: none; background: none; cursor: pointer;">
+            <input type="text" name="q" placeholder="ابحث في Google" required aria-label="بحث">
+            <button type="submit" style="border: none; background: none; cursor: pointer;" aria-label="زر البحث">
                 <i class="fas fa-search" style="color: inherit;"></i>
             </button>
         </div>
@@ -277,305 +277,306 @@
             <span id="totalSites">0</span>
         </div>
         <div class="stat">
-            <p> سجل البحث:</p>
+            <p>سجل البحث:</p>
             <span id="recentSites">-</span>
         </div>
         <div class="stat">
             <p>الموقع الأكثر زيارة:</p>
             <span id="mostVisitedSite">-</span>
         </div>
-    </div>    
+    </div>
     <h1>مواقعك المفضلة</h1>
     <div class="container" id="siteContainer"></div>
-    <a href="#" id="clearData" style="position: fixed; bottom: 10px; left: 10px; color: var(--primary-color); text-decoration: underline;">حذف البيانات</a>
+    <a href="#" id="clearData" style="position: fixed; bottom: 10px; left: 10px; color: var(--primary-color); text-decoration: underline;" aria-label="حذف البيانات">حذف البيانات</a>
+    <div id="notification" class="hidden" aria-live="polite" aria-atomic="true"></div>
+<script>
+    const state = {
+        sites: [],
+        darkMode: false,
+        gridColumns: 2
+    };
 
-    <script>
-        const state = {
-            sites: [],
-            darkMode: false,
-            gridColumns: 2
-        };
+    const elements = {
+        body: document.body,
+        container: document.getElementById('siteContainer'),
+        popupForm: document.getElementById('popupForm'),
+        popupSiteName: document.getElementById('popupSiteName'),
+        popupSiteURL: document.getElementById('popupSiteURL'),
+        darkModeToggle: document.getElementById('darkModeToggle'),
+        gridSelect: document.getElementById('gridSelect'),
+        clearDataBtn: document.getElementById('clearData'),
+        notification: document.getElementById('notification'),
+        downloadBtn: document.getElementById('downloadApk'),
+        totalSites: document.getElementById('totalSites'),
+        recentSites: document.getElementById('recentSites'),
+        mostVisitedSite: document.getElementById('mostVisitedSite')
+    };
+    
+    
 
-        const elements = {
-            body: document.body,
-            container: document.getElementById('siteContainer'),
-            popupForm: document.getElementById('popupForm'),
-            popupSiteName: document.getElementById('popupSiteName'),
-            popupSiteURL: document.getElementById('popupSiteURL'),
-            darkModeToggle: document.getElementById('darkModeToggle'),
-            gridSelect: document.getElementById('gridSelect'),
-            clearDataBtn: document.getElementById('clearData')
-        };
-
-        document.addEventListener('click', (e) => {
-            const target = e.target;
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        
+        if (target.closest('.add-icon')) {
+            showPopup();
+        } else if (target === elements.popupForm) {
+            hidePopup();
+        } else if (target.closest('.icon-button')) {
+            const button = target.closest('.icon-button');
+            const card = button.closest('.site-card');
+            const index = Array.from(elements.container.children).indexOf(card);
             
-            if (target.closest('.add-icon')) {
-                showPopup();
-            } else if (target === elements.popupForm) {
-                hidePopup();
-            } else if (target.closest('.icon-button')) {
-                const button = target.closest('.icon-button');
-                const card = button.closest('.site-card');
-                const index = Array.from(elements.container.children).indexOf(card);
-                
-                if (button.querySelector('.fa-trash')) {
-                    deleteSite(index);
-                } else if (button.querySelector('.fa-edit')) {
-                    const fileInput = document.getElementById(`fileInput${index}`);
-                    fileInput?.click();
-                }
+            if (button.querySelector('.fa-trash')) {
+                deleteSite(index);
+            } else if (button.querySelector('.fa-edit')) {
+                const fileInput = document.getElementById(`fileInput${index}`);
+                fileInput?.click();
             }
-        });
+        }
+    });
 
-        function loadSites() {
-    let sites = JSON.parse(localStorage.getItem('sites')) || [];
+function deleteSite(index) {
+
+    if (index < 0 || index >= state.sites.length) {
+        console.error("فهرس غير صالح للحذف:", index);
+        return;
+    }
+
+    if (confirm("هل أنت متأكد أنك تريد حذف هذا الموقع؟")) {
+        
+        state.sites.splice(index, 1);
+
+        localStorage.setItem('sites', JSON.stringify(state.sites));
+
+        loadSites();
+
+        updateStats();
+    }
+}
+
+function loadSites() {
+    state.sites = JSON.parse(localStorage.getItem('sites')) || [];
+
     const urlPattern = /^(https?:\/\/\S+)/;
-    sites = sites.filter(site => urlPattern.test(site.url.trim()) && site.url.trim().length > 8);
-    localStorage.setItem('sites', JSON.stringify(sites));
+    state.sites = state.sites.filter(site => urlPattern.test(site.url.trim()) && site.url.trim().length > 8);
+    localStorage.setItem('sites', JSON.stringify(state.sites));
 
-    const fragment = document.createDocumentFragment();
-    sites.forEach((site, index) => {
+    elements.container.innerHTML = '';
+
+    state.sites.forEach((site, index) => {
         const siteCard = document.createElement('div');
         siteCard.className = 'site-card';
 
         const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
-siteCard.innerHTML = `
-    <div class="icon-buttons">
-        <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
-        <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
-        <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
-    </div>
-    <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
-        <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy" 
-        onerror="this.onerror=null;this.src='default-image.png';">
-        <p>${site.name}</p>
-    </a>
-`;
+        siteCard.innerHTML = `
+            <div class="icon-buttons">
+                <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
+                <input type="file" id="fileInput${index}" style="display: none;" accept="image/*" onchange="updateImage(${index}, event)">
+                <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
+            </div>
+            <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
+                <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy" 
+                onerror="this.onerror=null;this.src='default-image.png';">
+                <p>${site.name}</p>
+            </a>
+        `;
+
+        elements.container.appendChild(siteCard);
+    });
+}
+
+    function toggleDarkMode() {
+        state.darkMode = !state.darkMode;
+        elements.body.classList.toggle('dark-mode', state.darkMode);
+        
+        localStorage.setItem('darkMode', state.darkMode ? 'enabled' : 'disabled');
+        
+        elements.darkModeToggle.querySelector('i').className = state.darkMode ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    let saveVisitsDebounced = debounce(() => {
+        localStorage.setItem('sites', JSON.stringify(state.sites));
+    }, 1000);
 
 
-        setTimeout(() => {
-            siteCard.classList.add('appear');
-        }, index * 100);
+    function debounce(func, delay) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
 
-        fragment.appendChild(siteCard);
+    function showPopup() {
+        elements.popupForm.style.display = 'flex';
+    }
+
+    function hidePopup() {
+        elements.popupForm.style.display = 'none';
+    }
+
+    function addSiteFromPopup() {
+        const siteName = elements.popupSiteName.value.trim();
+        const siteURL = elements.popupSiteURL.value.trim();
+        
+        if (!siteName || !siteURL) return;
+
+        const newSite = { name: siteName, url: siteURL, visits: 0 };
+        state.sites.push(newSite);
+        localStorage.setItem('sites', JSON.stringify(state.sites));
+
+        addSiteCard(newSite, state.sites.length - 1);
+
+        elements.popupSiteName.value = '';
+        elements.popupSiteURL.value = '';
+        hidePopup();
+        updateStats();
+        showNotification("تم إضافة الموقع بنجاح!");
+    }
+
+    function addSiteCard(site, index) {
+        const siteCard = document.createElement('div');
+        siteCard.className = 'site-card';
+
+        const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
+        siteCard.innerHTML = `
+            <div class="icon-buttons">
+                <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
+                <input type="file" id="fileInput${index}" style="display: none;" accept="image/*" onchange="updateImage(${index}, event)">
+                <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
+            </div>
+            <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
+                <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy">
+                <p>${site.name}</p>
+            </a>
+        `;
+
+        elements.container.appendChild(siteCard);
+    }
+
+    function updateImage(index, event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            state.sites[index].image = e.target.result;
+            localStorage.setItem('sites', JSON.stringify(state.sites));
+            document.getElementById(`siteImage${index}`).src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    elements.gridSelect.addEventListener('change', (e) => {
+        state.gridColumns = e.target.value;
+        elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
+        localStorage.setItem('gridColumns', state.gridColumns);
     });
 
-    elements.container.innerHTML = '';
-    elements.container.appendChild(fragment);
-}
+    elements.darkModeToggle.addEventListener('click', toggleDarkMode);
 
-function toggleDarkMode() {
-    state.darkMode = !state.darkMode;
-    elements.body.classList.toggle('dark-mode', state.darkMode);
-    
-    localStorage.setItem('darkMode', state.darkMode ? 'enabled' : 'disabled');
-    
-    elements.darkModeToggle.querySelector('i').className = state.darkMode ? 'fas fa-sun' : 'fas fa-moon';
-}
-
-
-let saveVisitsDebounced = debounce(() => {
-    localStorage.setItem('sites', JSON.stringify(state.sites));
-}, 1000);
-
-function incrementVisits(index) {
-    state.sites[index].visits += 1;
-    updateStats();
-    saveVisitsDebounced();
-}
-
-function debounce(func, delay) {
-    let timer;
-    return function(...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => func.apply(this, args), delay);
-    };
-}
-
-        function showPopup() {
-            elements.popupForm.style.display = 'flex';
-        }
-
-        function hidePopup() {
-            elements.popupForm.style.display = 'none';
-        }
-
-        function addSiteFromPopup() {
-    const siteName = elements.popupSiteName.value.trim();
-    const siteURL = elements.popupSiteURL.value.trim();
-    
-    if (!siteName || !siteURL) return;
-
-    const newSite = { name: siteName, url: siteURL, visits: 0 };
-    state.sites.push(newSite);
-    localStorage.setItem('sites', JSON.stringify(state.sites));
-
-    addSiteCard(newSite, state.sites.length - 1);
-
-    elements.popupSiteName.value = '';
-    elements.popupSiteURL.value = '';
-    hidePopup();
-    updateStats();
-    showNotification("تم إضافة الموقع بنجاح!");
-}
-
-function addSiteCard(site, index) {
-    const siteCard = document.createElement('div');
-    siteCard.className = 'site-card';
-
-    const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
-    siteCard.innerHTML = `
-        <div class="icon-buttons">
-            <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
-            <input type="file" id="fileInput${index}" style="display: none;" accept="image/*">
-            <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
-        </div>
-        <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
-            <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy">
-            <p>${site.name}</p>
-        </a>
-    `;
-
-    elements.container.appendChild(siteCard);
-}
-
-
-        function updateImage(index, event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                state.sites[index].image = e.target.result;
-                localStorage.setItem('sites', JSON.stringify(state.sites));
-                document.getElementById(`siteImage${index}`).src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        elements.gridSelect.addEventListener('change', (e) => {
-            state.gridColumns = e.target.value;
-            elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
-            localStorage.setItem('gridColumns', state.gridColumns);
-        });
-
-        elements.darkModeToggle.addEventListener('click', toggleDarkMode);
-
-        elements.clearDataBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (confirm("هل أنت متأكد أنك تريد حذف جميع البيانات؟")) {
-                localStorage.removeItem('sites');
-                state.sites = [];
-                loadSites();
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            state.sites = JSON.parse(localStorage.getItem('sites')) || [];
-            state.gridColumns = localStorage.getItem('gridColumns') || 2;
-            state.darkMode = localStorage.getItem('darkMode') === 'enabled';
-
-            elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
-            elements.gridSelect.value = state.gridColumns;
-            
-            if (state.darkMode) {
-                elements.body.classList.add('dark-mode');
-                elements.darkModeToggle.querySelector('i').className = 'fas fa-sun';
-            }
-            updateStats();
+    elements.clearDataBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (confirm("هل أنت متأكد أنك تريد حذف جميع البيانات؟")) {
+            localStorage.removeItem('sites');
+            state.sites = [];
             loadSites();
-        });
+        }
+    });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && elements.popupForm.style.display === 'flex') {
-                hidePopup();
-            }
-        });
+    document.addEventListener('DOMContentLoaded', () => {
+        state.sites = JSON.parse(localStorage.getItem('sites')) || [];
+        state.gridColumns = localStorage.getItem('gridColumns') || 2;
+        state.darkMode = localStorage.getItem('darkMode') === 'enabled';
 
-        const topButtons = document.querySelector('.top-buttons');
-        let initialHeight = window.innerHeight;
-
-        const resizeObserver = new ResizeObserver(() => {
-            requestAnimationFrame(() => {
-                topButtons.style.display = (window.innerHeight < initialHeight) ? 'none' : 'flex';
-            });
-        });
-
-        resizeObserver.observe(document.documentElement);
-
-        function updateStats() {
-    const totalSites = state.sites.length;
-    const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-
-    const recentSearches = searchHistory.slice(-3).map(search => 
-        search.length > 10 ? search.substring(0, 10) + '...' : search
-    ).join(', ') || 'لا توجد عمليات بحث حديثة';
-
-    const mostVisitedSite = (state.sites.reduce((most, site) => 
-        site.visits > (most.visits || 0) ? site : most, {}).name || '-'
-    );
-
-    const truncatedMostVisitedSite = mostVisitedSite.length > 10 
-        ? mostVisitedSite.substring(0, 10) + '...' 
-        : mostVisitedSite;
-
-    document.getElementById('totalSites').textContent = totalSites;
-    document.getElementById('recentSites').textContent = recentSearches;
-    document.getElementById('mostVisitedSite').textContent = truncatedMostVisitedSite;
-}
-
-
-document.getElementById('searchForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const query = document.querySelector('#searchForm input[name="q"]').value.trim();
-    if (query) {
-        const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-        searchHistory.push(query);
-        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+        elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
+        elements.gridSelect.value = state.gridColumns;
+        
+        if (state.darkMode) {
+            elements.body.classList.add('dark-mode');
+            elements.darkModeToggle.querySelector('i').className = 'fas fa-sun';
+        }
         updateStats();
- 
+        loadSites();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && elements.popupForm.style.display === 'flex') {
+            hidePopup();
+        }
+    });
+
+    const topButtons = document.querySelector('.top-buttons');
+    let initialHeight = window.innerHeight;
+
+    const resizeObserver = new ResizeObserver(() => {
+        requestAnimationFrame(() => {
+            topButtons.style.display = (window.innerHeight < initialHeight) ? 'none' : 'flex';
+        });
+    });
+
+    resizeObserver.observe(document.documentElement);
+
+    function updateStats() {
+        const totalSites = state.sites.length;
+        const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+        const recentSearches = searchHistory.slice(-3).map(search => 
+            search.length > 10 ? search.substring(0, 10) + '...' : search
+        ).join(', ') || 'لا توجد عمليات بحث حديثة';
+
+        const mostVisitedSite = (state.sites.reduce((most, site) => 
+            site.visits > (most.visits || 0) ? site : most, {}).name || '-'
+        );
+
+        const truncatedMostVisitedSite = mostVisitedSite.length > 10 
+            ? mostVisitedSite.substring(0, 10) + '...' 
+            : mostVisitedSite;
+
+        elements.totalSites.textContent = totalSites;
+        elements.recentSites.textContent = recentSearches;
+        elements.mostVisitedSite.textContent = truncatedMostVisitedSite;
     }
-    this.submit();
-    
-});
 
-function showNotification(message) {
-    const notification = document.getElementById('notification');
-    clearTimeout(notification.timeout);
-    
-    notification.textContent = message;
-    notification.classList.remove('hidden');
-    notification.classList.add('show');
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const query = document.querySelector('#searchForm input[name="q"]').value.trim();
+        if (query) {
+            const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            searchHistory.push(query);
+            localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+            updateStats();
+        }
+        this.submit();
+    });
 
-    notification.timeout = setTimeout(() => {
-        notification.classList.remove('show');
-        notification.classList.add('hidden');
-    }, 3000);
-}
+    function showNotification(message) {
+        const notification = elements.notification;
+        clearTimeout(notification.timeout);
+        
+        notification.textContent = message;
+        notification.classList.remove('hidden');
+        notification.classList.add('show');
 
-function deleteSite(index) {    
-    state.sites.splice(index, 1);
-    localStorage.setItem('sites', JSON.stringify(state.sites));
-    
-    const siteCard = document.querySelectorAll('.site-card')[index];
-    siteCard.remove();
-    
-    updateStats();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const downloadBtn = document.getElementById('downloadApk');
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-    if (/iPhone|windows|mac|iPad|iPod/i.test(userAgent)) {
-        downloadBtn.style.display = 'none';
+        notification.timeout = setTimeout(() => {
+            notification.classList.remove('show');
+            notification.classList.add('hidden');
+        }, 3000);
     }
-});
-function downloadApk() {
-    window.location.href ='https://www.mediafire.com/file/mt8c93g9xyxtjrm/app-release.apk?dkey=fw2w24wkaok&r=1823';
 
-}
-    </script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+        if (/iPhone|windows|mac|iPad|iPod/i.test(userAgent)) {
+            elements.downloadBtn.style.display = 'none';
+        }
+    });
+
+    function downloadApk() {
+        window.location.href = 'https://www.mediafire.com/file/mt8c93g9xyxtjrm/app-release.apk?dkey=fw2w24wkaok&r=1823';
+    }
+</script>
+
 </body>
 </html>
