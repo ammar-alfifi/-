@@ -45,7 +45,6 @@
         margin: 0;
         padding: 0;
         display: flex;
-        justify-content: center;
         flex-direction: column;
         align-items: center;
         min-height: 100vh;
@@ -57,13 +56,10 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 20px;
-        width: 100%;
-        max-width: 1000px;
+        width: auto;
+        max-width: 437px;
         margin: 20px auto;
     }
-    .content {
-            text-align: center;
-        }
 
         .site-card {
             width: 120px;
@@ -171,8 +167,8 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        width: 90%;
-        max-width: 400px;
+        width: 110%;
+        max-width: 420px;
     }
 
         #searchBar input {
@@ -247,8 +243,8 @@
 
 .dropdown {
         position: fixed;
-        top: 20px;
-        right: 20px;
+        top: 25px;
+        left: 20px;
         z-index: 1000;
     }
 
@@ -617,7 +613,7 @@
     --search-bar-bg: #452222;
     --accent-color: #ef9a9a;
 }
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 437px) {
             body {
                 font-size: 14px;
             }
