@@ -9,7 +9,7 @@
         :root {
         --bg-color: #f5f5f5;
         --text-color: #333;
-        --card-bg: #ff0000;
+        --card-bg: #ffffff;
         --shadow-color: rgba(0, 0, 0, 0.1);
         --primary-color: #4caf50;
         --primary-hover: #388e3c;
@@ -1043,6 +1043,7 @@ function closeSettings() {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
+    loadSites();
     
     const fontSelect = document.getElementById('fontSelect');
     if (fontSelect) {
