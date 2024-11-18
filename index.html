@@ -612,7 +612,11 @@
     --search-bar-bg: #452222;
     --accent-color: #ef9a9a;
 }
-
+@media screen and (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1094,6 +1098,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        if (darkModeMediaQuery.matches) {
+            document.body.classList.add('deepdark');
+        }
+        document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no');
 </script>
 
 </body>
