@@ -672,6 +672,8 @@
 
             <button onclick="closeSettings()">إغلاق</button>
             <button onclick="resetCustomization()">إعادة تعيين التخصيص</button>
+            <button class="export-button" onclick="exportData()">تصدير</button>
+    <button class="import-button" onclick="importData()">استيراد</button>
         </div>
     </div>
     
@@ -1104,6 +1106,47 @@ const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
             document.body.classList.add('deepdark');
         }
         document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no');
+        function exportData() {
+    const data = {
+        sites: state.sites,
+        settings: getCurrentSettings()
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "data.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+}
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (importedData.sites) {
+                    state.sites = importedData.sites;
+                    localStorage.setItem('sites', JSON.stringify(state.sites));
+                    loadSites();
+                }
+                if (importedData.settings) {
+                    applySettings(importedData.settings);
+                }
+                alert("تم استيراد البيانات بنجاح!");
+            } catch (error) {
+                alert("فشل استيراد البيانات! يرجى التأكد من صحة الملف.");
+            }
+        };
+        reader.readAsText(file);
+    });
+    input.click();
+}
 </script>
 
 </body>
