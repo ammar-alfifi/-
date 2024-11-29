@@ -673,7 +673,8 @@
             <button onclick="closeSettings()">إغلاق</button>
             <button onclick="resetCustomization()">إعادة تعيين التخصيص</button>
             <button class="export-button" onclick="exportData()">تصدير</button>
-    <button class="import-button" onclick="importData()">استيراد</button>
+<input type="file" id="fileInput" accept="application/json" style="display: none;" onchange="importData(event)">
+<button onclick="document.getElementById('fileInput').click()">استيراد</button>
         </div>
     </div>
     
