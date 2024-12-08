@@ -79,6 +79,7 @@
         height: 120px;
     object-fit: cover; 
     aspect-ratio: 1 / 1; 
+    border-radius: 8px;
 }
 
         .site-card p {
@@ -1150,66 +1151,107 @@ function importData() {
     });
     input.click();
 }
-function makeCardsDraggableMobile() {
+function makeCardsDraggable() {
     const container = document.getElementById('siteContainer');
-    let draggedElement = null;
-    let touchStartY = 0;
-
     const cards = document.querySelectorAll('.site-card');
+
+    let draggedElement = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let initialX = 0;
+    let initialY = 0;
+    let pressTimer = null;
+    const longPressDelay = 800;
+
     cards.forEach((card, index) => {
         card.addEventListener('touchstart', (event) => {
-            draggedElement = card;
+            pressTimer = setTimeout(() => {
+                draggedElement = card;
+                draggedElement.classList.add('dragging');
+                initialX = event.touches[0].clientX - touchStartX;
+                initialY = event.touches[0].clientY - touchStartY;
+            }, longPressDelay);
+
+            touchStartX = event.touches[0].clientX;
             touchStartY = event.touches[0].clientY;
-            card.classList.add('dragging');
+        });
+
+        card.addEventListener('touchend', () => {
+            clearTimeout(pressTimer);
         });
 
         card.addEventListener('touchmove', (event) => {
             if (!draggedElement) return;
 
-            const touchY = event.touches[0].clientY;
-            const afterElement = getDragAfterElement(container, touchY);
-            if (afterElement == null) {
-                container.appendChild(draggedElement);
-            } else {
-                container.insertBefore(draggedElement, afterElement);
-            }
+            const touchMoveX = event.touches[0].clientX;
+            const touchMoveY = event.touches[0].clientY;
+
+            const moveX = touchMoveX - touchStartX + initialX;
+            const moveY = touchMoveY - touchStartY + initialY;
+
+            draggedElement.style.position = 'absolute';
+            draggedElement.style.left = `${moveX}px`;
+            draggedElement.style.top = `${moveY}px`;
+
+            const draggedElementRect = draggedElement.getBoundingClientRect();
+            const allCards = Array.from(container.children);
+            allCards.forEach(card => {
+                const cardRect = card.getBoundingClientRect();
+                if (card !== draggedElement && isElementNear(draggedElementRect, cardRect)) {
+                    swapSites(draggedElement, card);
+                }
+            });
         });
 
         card.addEventListener('touchend', () => {
             if (!draggedElement) return;
 
             draggedElement.classList.remove('dragging');
+            draggedElement.style.position = 'relative';
+            draggedElement.style.left = '0';
+            draggedElement.style.top = '0';
+
+            saveNewOrder();
+
             draggedElement = null;
-
-            const newOrder = Array.from(container.children).map((child) => {
-                return state.sites.find(site => site.name === child.querySelector('p').innerText);
-            });
-
-            state.sites = newOrder;
-            localStorage.setItem('sites', JSON.stringify(state.sites));
         });
     });
-}
 
-function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.site-card:not(.dragging)')];
+    function isElementNear(draggedElementRect, cardRect) {
+        const threshold = 50;
+        return Math.abs(draggedElementRect.top - cardRect.top) < threshold;
+    }
 
-    return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
+    function swapSites(draggedElement, targetElement) {
+        const draggedIndex = Array.from(container.children).indexOf(draggedElement);
+        const targetIndex = Array.from(container.children).indexOf(targetElement);
 
-        if (offset < 0 && offset > closest.offset) {
-            return { offset: offset, element: child };
-        } else {
-            return closest;
+        if (draggedIndex !== targetIndex) {
+            if (draggedIndex < targetIndex) {
+                container.insertBefore(draggedElement, targetElement.nextSibling);
+            } else {
+                container.insertBefore(draggedElement, targetElement);
+            }
+
+            saveNewOrder();
         }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function saveNewOrder() {
+        const newOrder = Array.from(container.children).map((child) => {
+            return state.sites.find(site => site.name === child.querySelector('p').innerText);
+        });
+
+        state.sites = newOrder;
+        localStorage.setItem('sites', JSON.stringify(state.sites)); // حفظ التغييرات
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSites();
-    makeCardsDraggableMobile();
+    makeCardsDraggable();
 });
+
 </script>
 
 </body>
