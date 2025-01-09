@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css"> <!-- استخدم نفس ملف التنسيق الخاص بالصفحة الرئيسية -->
+    <link rel="stylesheet" href="styles.css">
     <style>
 :root {
     --bg-color: #ffffff;
@@ -300,8 +300,8 @@
     
         .container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* الأعمدة تتغير حسب العرض */
-    gap: 20px; /* المسافة بين العناصر */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 20px;
     max-width: 100%;
     margin: 20px auto;
 }
@@ -331,7 +331,7 @@
 }
 
 .site-card input {
-    display: none; /* إخفاء مربع الاختيار */
+    display: none;
 }
 
 .site-card label {
@@ -343,9 +343,9 @@
 }
 
 .site-card input:checked + label {
-    border-color: var(--primary-color); /* لون الهالة */
-    box-shadow: 0 0 15px var(--primary-color); /* تأثير الهالة */
-    transform: scale(1.05); /* تكبير البطاقة قليلاً عند التحديد */
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px var(--primary-color);
+    transform: scale(1.05); 
 }
 
         button {
@@ -369,8 +369,7 @@
     <h1>أختر مفضلتك</h1>
     <div class="container" id="siteContainer"></div>
     <button onclick="saveSelectedSites()" style="margin-top: 20px;">حفظ</button>
-
-    <script>       
+    <script> 
         function saveSelectedSites() {
             const selectedSites = [];
             document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
@@ -382,7 +381,7 @@
             const updatedSites = [...existingSites, ...selectedSites];
             localStorage.setItem('sites', JSON.stringify(updatedSites));
             alert('تم حفظ المواقع بنجاح!');
-            window.location.href = 'index.html'; // العودة إلى الصفحة الرئيسية
+            window.location.href = 'index.html';
         }
     document.addEventListener('DOMContentLoaded', () => {
         const savedTheme = localStorage.getItem('userSettings');
@@ -417,7 +416,6 @@
     { "name": "WhatsApp", "url": "https://web.whatsapp.com/" },
     { "name": "Google", "url": "https://www.google.com" }
 ]
-
 
 const container = document.getElementById('siteContainer');
 sites.forEach(site => {

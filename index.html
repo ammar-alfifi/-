@@ -690,6 +690,11 @@
             <label for="popupSiteURL"></label>
             <input type="url" id="popupSiteURL" placeholder="رابط الموقع" required>
             <button onclick="addSiteFromPopup()">إضافة الموقع</button>
+            <a href="webs.html">
+                <button>
+                    إضافة مواقع جديدة
+                </button>
+            </a>            
         </div>
     </div>
     <div class="dropdown">
@@ -730,6 +735,13 @@
     <a href="#" id="clearData" style="position: fixed; bottom: 10px; left: 10px; color: var(--primary-color); text-decoration: underline;" aria-label="حذف البيانات">حذف البيانات</a>
     <div id="notification" class="hidden" aria-live="polite" aria-atomic="true"></div>
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const visited = localStorage.getItem('visited');
+    if (!visited) {
+        localStorage.setItem('visited', 'true');
+        window.location.href = 'anotherPage.html';
+    }
+});
     const state = {
         sites: [],
         darkMode: false,
