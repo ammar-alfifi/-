@@ -1,304 +1,59 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <style>
-:root {
-    --bg-color: #ffffff;
-    --text-color: #1a1a1a;
-    --card-bg: #cfcfcf;
-    --shadow-color: rgba(0, 0, 0, 0.05);
-    --primary-color: #2e2e2e;
-    --primary-hover: #2e2e2e;
-    --input-bg: #f5f5f5;
-    --input-text: #2e2e2e;
-    --placeholder-color: #7a7a7a;
-    --search-bar-bg: #cfcfcf;
-    --accent-color: #8b8b8b;
-}
-    .dark-mode {
-    --bg-color: #0a0a0a;
-    --text-color: #c4c4c4;
-    --card-bg: #161616;
-    --shadow-color: rgba(0, 0, 0, 0.6);
-    --primary-color: #8c8c8c;
-    --primary-hover: #7a7a7a;
-    --input-bg: #1f1f1f;
-    --input-text: #c4c4c4;
-    --placeholder-color: #5e5e5e;
-    --search-bar-bg: #161616;
-    --accent-color: #6e6e6e;
-}
-        .deepdark {
-    --bg-color: #0a0a0a;
-    --text-color: #c4c4c4;
-    --card-bg: #161616;
-    --shadow-color: rgba(0, 0, 0, 0.6);
-    --primary-color: #8c8c8c;
-    --primary-hover: #7a7a7a;
-    --input-bg: #1f1f1f;
-    --input-text: #c4c4c4;
-    --placeholder-color: #5e5e5e;
-    --search-bar-bg: #161616;
-    --accent-color: #6e6e6e;
-}
-.greendark {
-    --bg-color: #1b2b1b;
-    --text-color: #b8e994;
-    --card-bg: #243424;
-    --shadow-color: rgba(0, 50, 0, 0.3);
-    --primary-color: #76c893;
-    --primary-hover: #5ca377;
-    --input-bg: #2a372a;
-    --input-text: #b8e994;
-    --placeholder-color: #657d65;
-    --search-bar-bg: #223322;
-    --accent-color: #a5d6a7;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إعدادات المظاهر</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #1a1a1a;
+      --card-bg: #cfcfcf;
+      --shadow-color: rgba(0, 0, 0, 0.05);
+      --primary-color: #2e2e2e;
+      --primary-hover: #2e2e2e;
+      --input-bg: #f5f5f5;
+      --input-text: #2e2e2e;
+      --placeholder-color: #7a7a7a;
+      --search-bar-bg: #cfcfcf;
+      --accent-color: #8b8b8b;
+      --font-family: "Arial", sans-serif;
+    }
 
-.purpledark {
-    --bg-color: #2e1b47;
-    --text-color: #d4b5ff;
-    --card-bg: #3b2560;
-    --shadow-color: rgba(50, 0, 50, 0.3);
-    --primary-color: #ab47bc;
-    --primary-hover: #9c27b0;
-    --input-bg: #452d5f;
-    --input-text: #d4b5ff;
-    --placeholder-color: #85618b;
-    --search-bar-bg: #3a245d;
-    --accent-color: #ce93d8;
-}
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--font-family);
+      margin: 0;
+      padding: 20px;
+    }
 
-.pinkdark {
-    --bg-color: #3a1e2f;
-    --text-color: #f8bbd0;
-    --card-bg: #4a263b;
-    --shadow-color: rgba(50, 0, 20, 0.3);
-    --primary-color: #ec407a;
-    --primary-hover: #e91e63;
-    --input-bg: #562842;
-    --input-text: #f8bbd0;
-    --placeholder-color: #94567b;
-    --search-bar-bg: #4a2d3f;
-    --accent-color: #f48fb1;
-}
+    .card {
+      background-color: var(--card-bg);
+      box-shadow: 0px 4px 8px var(--shadow-color);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
 
-.kde {
-    --bg-color: #232629;
-    --text-color: #ffffff;
-    --card-bg: #2d2f33;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --primary-color: #3498db;
-    --primary-hover: #2980b9;
-    --input-bg: #2e3135;
-    --input-text: #ffffff;
-    --placeholder-color: #778899;
-    --search-bar-bg: #292c2f;
-    --accent-color: #1abc9c;
-}
+    select, button {
+      background-color: var(--primary-color);
+      color: var(--input-text);
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
 
-.vertexdark {
-    --bg-color: #2a2a2a;
-    --text-color: #dddddd;
-    --card-bg: #333333;
-    --shadow-color: rgba(0, 0, 0, 0.2);
-    --primary-color: #4caf50;
-    --primary-hover: #388e3c;
-    --input-bg: #3b3b3b;
-    --input-text: #dddddd;
-    --placeholder-color: #666666;
-    --search-bar-bg: #313131;
-    --accent-color: #8bc34a;
-}
+    select {
+      margin-bottom: 15px;
+    }
 
-.discord {
-    --bg-color: #2c2f33;
-    --text-color: #ffffff;
-    --card-bg: #23272a;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --primary-color: #7289da;
-    --primary-hover: #5f73bf;
-    --input-bg: #36393f;
-    --input-text: #ffffff;
-    --placeholder-color: #99aab5;
-    --search-bar-bg: #2f3136;
-    --accent-color: #5865f2;
-}
-
-.firefoxdark {
-    --bg-color: #212121;
-    --text-color: #e0e0e0;
-    --card-bg: #292929;
-    --shadow-color: rgba(0, 0, 0, 0.4);
-    --primary-color: #ff9800;
-    --primary-hover: #fb8c00;
-    --input-bg: #333333;
-    --input-text: #e0e0e0;
-    --placeholder-color: #777777;
-    --search-bar-bg: #262626;
-    --accent-color: #ff5722;
-}
-
-.firefoxquantumdark {
-    --bg-color: #181818;
-    --text-color: #e0e0e0;
-    --card-bg: #232323;
-    --shadow-color: rgba(0, 0, 0, 0.5);
-    --primary-color: #2196f3;
-    --primary-hover: #1e88e5;
-    --input-bg: #303030;
-    --input-text: #e0e0e0;
-    --placeholder-color: #808080;
-    --search-bar-bg: #202020;
-    --accent-color: #42a5f5;
-}
-
-.firefoxalpenglowdark {
-    --bg-color: #34293c;
-    --text-color: #ffccff;
-    --card-bg: #3c2f45;
-    --shadow-color: rgba(50, 0, 50, 0.4);
-    --primary-color: #ff80ab;
-    --primary-hover: #ff4081;
-    --input-bg: #432f46;
-    --input-text: #ffccff;
-    --placeholder-color: #996699;
-    --search-bar-bg: #3b2e44;
-    --accent-color: #ff99cc;
-}
-.nineanime {
-    --bg-color: #1a1c22;
-    --text-color: #b3b3b3;
-    --card-bg: #242630;
-    --shadow-color: rgba(0, 0, 0, 0.5);
-    --primary-color: #7158e2;
-    --primary-hover: #5a43c9;
-    --input-bg: #2b2d38;
-    --input-text: #dcdcdc;
-    --placeholder-color: #666666;
-    --search-bar-bg: #1e2029;
-    --accent-color: #a29bfe;
-}
-
-.orangedark {
-    --bg-color: #4a2d1c;
-    --text-color: #ffcc99;
-    --card-bg: #5a3722;
-    --shadow-color: rgba(50, 25, 0, 0.4);
-    --primary-color: #ff7043;
-    --primary-hover: #ff5722;
-    --input-bg: #60402c;
-    --input-text: #ffe0cc;
-    --placeholder-color: #a67c66;
-    --search-bar-bg: #503524;
-    --accent-color: #ffab91;
-}
-
-.yellowdark {
-    --bg-color: #4a421d;
-    --text-color: #ffee58;
-    --card-bg: #5a4e26;
-    --shadow-color: rgba(80, 70, 20, 0.4);
-    --primary-color: #fdd835;
-    --primary-hover: #fbc02d;
-    --input-bg: #655429;
-    --input-text: #ffeb3b;
-    --placeholder-color: #bfae77;
-    --search-bar-bg: #564922;
-    --accent-color: #fff176;
-}
-
-.ubuntugrey {
-    --bg-color: #2c2c2c;
-    --text-color: #e0e0e0;
-    --card-bg: #383838;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --primary-color: #ff6f61;
-    --primary-hover: #e65a50;
-    --input-bg: #404040;
-    --input-text: #f0f0f0;
-    --placeholder-color: #8c8c8c;
-    --search-bar-bg: #353535;
-    --accent-color: #ffa899;
-}
-
-.ubuntupurple {
-    --bg-color: #2a1e3e;
-    --text-color: #e1bee7;
-    --card-bg: #35254b;
-    --shadow-color: rgba(50, 25, 70, 0.4);
-    --primary-color: #7e57c2;
-    --primary-hover: #673ab7;
-    --input-bg: #402b5c;
-    --input-text: #e1bee7;
-    --placeholder-color: #9575cd;
-    --search-bar-bg: #39234d;
-    --accent-color: #b39ddb;
-}
-
-.mintydark {
-    --bg-color: #2a3b2e;
-    --text-color: #c8e6c9;
-    --card-bg: #33483a;
-    --shadow-color: rgba(50, 80, 50, 0.4);
-    --primary-color: #66bb6a;
-    --primary-hover: #4caf50;
-    --input-bg: #3c5242;
-    --input-text: #c8e6c9;
-    --placeholder-color: #81c784;
-    --search-bar-bg: #2e3f30;
-    --accent-color: #a5d6a7;
-}
-
-.arcdark {
-    --bg-color: #3b4252;
-    --text-color: #eceff4;
-    --card-bg: #434c5e;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --primary-color: #81a1c1;
-    --primary-hover: #5e81ac;
-    --input-bg: #4c566a;
-    --input-text: #eceff4;
-    --placeholder-color: #b0bec5;
-    --search-bar-bg: #3b4252;
-    --accent-color: #8fbcbb;
-}
-
-.reddark {
-    --bg-color: #3e1e1e;
-    --text-color: #ffcdd2;
-    --card-bg: #4c2424;
-    --shadow-color: rgba(80, 0, 0, 0.4);
-    --primary-color: #e57373;
-    --primary-hover: #f44336;
-    --input-bg: #5a2a2a;
-    --input-text: #ffcdd2;
-    --placeholder-color: #d32f2f;
-    --search-bar-bg: #452222;
-    --accent-color: #ef9a9a;
-}
-    
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-    
-        h1 {
-            margin: 20px;
-        }
-    
-        .container {
+    .theme-buttons button {
+      margin: 5px;
+    }
+    .container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 20px;
@@ -363,19 +118,160 @@
         button:hover {
             background-color: var(--primary-hover);
         }
-    </style>    
+  </style>
 </head>
 <body>
-    <h1>أختر مفضلتك</h1>
-    <div class="container" id="siteContainer"></div>
-    <button onclick="saveSelectedSites()" style="margin-top: 20px;">حفظ</button>
-    <script> 
-        function saveSelectedSites() {
-            const selectedSites = [];
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
-                const siteName = checkbox.nextElementSibling.querySelector('p').textContent;
-                selectedSites.push({ name: siteName, url: checkbox.value });
-            });
+  <h1>إعدادات المظاهر</h1>
+  <div class="card">
+    <h2>اختر المظهر</h2>
+    <div class="theme-buttons">
+        <button data-theme="default" class="theme-button" onclick="applyTheme('default')">Default</button>
+        <button data-theme="deepdark">Deep Dark</button>
+      <button data-theme="greendark">Green Dark</button>
+      <button data-theme="purpledark">Purple Dark</button>
+      <button data-theme="firefoxdark">Firefox Dark</button>
+      <button data-theme="orangedark">Orange Dark</button>
+      <button data-theme="arcdark">Arc Dark</button>
+    </div>
+  </div>
+  <h1>أختر مفضلتك</h1>
+  <div class="container" id="siteContainer"></div>
+  <button onclick="saveSelectedSites()" style="margin-top: 20px;">حفظ</button>
+  <script>
+    const themes = {
+     default: {
+   "--bg-color": "#ffffff",
+   "--text-color": "#1a1a1a",
+   "--card-bg": "#cfcfcf",
+   "--shadow-color": "rgba(0, 0, 0, 0.05)",
+   "--primary-color": "#2e2e2e",
+   "--primary-hover": "#2e2e2e",
+   "--input-bg": "#f5f5f5",
+   "--input-text": "#ffffff",
+   "--placeholder-color": "#7a7a7a",
+   "--search-bar-bg": "#cfcfcf",
+   "--accent-color": "#8b8b8b",
+},
+      deepdark: {
+        "--bg-color": "#121212",
+        "--text-color": "#e0e0e0",
+        "--card-bg": "#1e1e1e",
+        "--shadow-color": "rgba(0, 0, 0, 0.5)",
+        "--primary-color": "#8e8e8e",
+        "--primary-hover": "#7a7a7a",
+        "--input-bg": "#252525",
+        "--input-text": "#e0e0e0",
+        "--placeholder-color": "#575757",
+        "--search-bar-bg": "#1a1a1a",
+        "--accent-color": "#9a9a9a",
+      },
+      greendark: {
+        "--bg-color": "#1f2f1f",
+        "--text-color": "#d4f0c0",
+        "--card-bg": "#2a3a2a",
+        "--shadow-color": "rgba(0, 50, 0, 0.4)",
+        "--primary-color": "#82d48f",
+        "--primary-hover": "#6bb377",
+        "--input-bg": "#303f30",
+        "--input-text": "#d4f0c0",
+        "--placeholder-color": "#6b8f6b",
+        "--search-bar-bg": "#263526",
+        "--accent-color": "#98e0a3",
+      },
+      purpledark: {
+        "--bg-color": "#2b1a3d",
+        "--text-color": "#e5d4ff",
+        "--card-bg": "#3c2554",
+        "--shadow-color": "rgba(50, 0, 50, 0.4)",
+        "--primary-color": "#b47bd8",
+        "--primary-hover": "#9c4fcc",
+        "--input-bg": "#442b59",
+        "--input-text": "#e5d4ff",
+        "--placeholder-color": "#876595",
+        "--search-bar-bg": "#351e4a",
+        "--accent-color": "#c59fe3",
+      },
+      firefoxdark: {
+        "--bg-color": "#202020",
+        "--text-color": "#e0e0e0",
+        "--card-bg": "#292929",
+        "--shadow-color": "rgba(0, 0, 0, 0.4)",
+        "--primary-color": "#f78a34",
+        "--primary-hover": "#e76a2c",
+        "--input-bg": "#2f2f2f",
+        "--input-text": "#f0f0f0",
+        "--placeholder-color": "#777777",
+        "--search-bar-bg": "#262626",
+        "--accent-color": "#ff6e40",
+      },
+      orangedark: {
+        "--bg-color": "#402d1c",
+        "--text-color": "#ffdab5",
+        "--card-bg": "#513720",
+        "--shadow-color": "rgba(50, 25, 0, 0.4)",
+        "--primary-color": "#ff8754",
+        "--primary-hover": "#e96a3d",
+        "--input-bg": "#5a3f28",
+        "--input-text": "#ffe7cc",
+        "--placeholder-color": "#a97d62",
+        "--search-bar-bg": "#4a341f",
+        "--accent-color": "#ffab87",
+      },
+      arcdark: {
+        "--bg-color": "#3a4252",
+        "--text-color": "#eceff4",
+        "--card-bg": "#424c5e",
+        "--shadow-color": "rgba(0, 0, 0, 0.3)",
+        "--primary-color": "#6b8fbb",
+        "--primary-hover": "#5879a1",
+        "--input-bg": "#4b566a",
+        "--input-text": "#f0f4f8",
+        "--placeholder-color": "#b0b9c2",
+        "--search-bar-bg": "#3a4252",
+        "--accent-color": "#87a8c5",
+      },
+    };
+
+    const root = document.documentElement;
+
+    function applyTheme(theme) {
+    const themeVars = themes[theme];
+    for (let key in themeVars) {
+        document.documentElement.style.setProperty(key, themeVars[key]);
+    }
+    localStorage.setItem('theme', theme);
+}
+
+    function loadSettings() {
+      const savedTheme = localStorage.getItem("theme") || "default";
+      applyTheme(savedTheme);
+    }
+
+    function saveSettings() {
+    const currentTheme = document.querySelector("button[data-theme].active").dataset.theme;
+    localStorage.setItem("theme", currentTheme);
+    alert("تم حفظ الإعدادات بنجاح!");
+}
+
+
+    document.querySelectorAll("button[data-theme]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("button[data-theme]").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        applyTheme(button.dataset.theme);
+      });
+    });
+
+    window.addEventListener("DOMContentLoaded", loadSettings);
+    function saveSelectedSites() {
+        const selectedSites = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+            const siteName = checkbox.nextElementSibling.querySelector('p').textContent;
+            const siteUrl = checkbox.value;
+            const siteImage = checkbox.nextElementSibling.querySelector('img').src;
+
+            selectedSites.push({ name: siteName, url: siteUrl, image: siteImage });
+        });
 
             const existingSites = JSON.parse(localStorage.getItem('sites')) || [];
             const updatedSites = [...existingSites, ...selectedSites];
@@ -389,7 +285,11 @@
             const settings = JSON.parse(savedTheme);
             document.body.className = settings.theme || '';
         }
+        document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem("theme") || "default";
+    applyTheme(savedTheme);
     });
+});
     const sites = [
     { "name": "FC", "url": "https://www.ea.com/ea-sports-fc/ultimate-team/web-app/", "image": "img/fc.png" },
     { "name": "منصة العمل التطوعي", "url": "https://nvg.gov.sa/" , "image": "img/t.jpg" },
@@ -409,7 +309,7 @@
     { "name": "Instagram", "url": "https://www.instagram.com/" , "image": "" },
     { "name": "Netflix", "url": "https://www.netflix.com/" , "image": "" },
     { "name": "Wikipedia", "url": "https://www.wikipedia.org/" , "image": "" },
-    { "name": "الخرائط", "url": "https://www.google.com/maps" , "image": "" },
+    { "name": "الخرائط", "url": "https://www.google.com/maps" , "image": "img/map.png" },
     { "name": "مترجم", "url": "https://translate.google.com/?hl=ar&sl=en&tl=ar&op=translate" },
     { "name": "Fmhy", "url": "https://fmhy.net/" },
     { "name": "YouTube", "url": "https://youtube.com" },
@@ -434,8 +334,17 @@ sites.forEach(site => {
     
     container.insertAdjacentHTML('beforeend', siteCard);
 });
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("theme") || "Default";
+      document.body.className = savedTheme;
+      document.getElementById("theme").value = savedTheme;
+    });
 
-
-    </script>
+    document.getElementById("theme").addEventListener("change", (event) => {
+      const selectedTheme = event.target.value;
+      document.body.className = selectedTheme;
+      localStorage.setItem("theme", selectedTheme);
+    });
+  </script>
 </body>
 </html>
