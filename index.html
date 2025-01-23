@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
     <meta charset="UTF-8">
@@ -45,12 +46,11 @@ a:hover {
     }
 
         .container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 20px;
-        width: auto;
-        max-width: 437px;
-        margin: 20px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 20px;
+    max-width: 100%;
+    margin: 20px auto;
     }
 
         .site-card {
@@ -61,10 +61,20 @@ a:hover {
             box-shadow: 0 4px 8px var(--shadow-color);
             background-color: var(--card-bg);
             position: relative;
-            transition: transform 0.2s;
             will-change: transform;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
+        .site-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.site-card.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 
         .site-card:hover {
         transform: translateY(-5px);
@@ -99,8 +109,15 @@ a:hover {
         .popup-content button:hover {
             background-color: var(--primary-hover);
         }
+        .popup-form.show {
+    opacity: 1;
+    transform: scale(1);
+}
 
         .popup-form {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.3s ease, transform 0.3s ease;
             display: none;
             position: fixed;
             top: 0;
@@ -147,10 +164,11 @@ a:hover {
             padding: 5px;
             cursor: pointer;
             color: var(#333);
-            transition: background-color 0.2s;
+            transition: transform 0.2s ease, background-color 0.3s ease;
         }
 
         .icon-button:hover {
+            transform: scale(1.1);
             background-color: rgba(200, 200, 200, 0.8);
         }
 
@@ -464,16 +482,8 @@ a:hover {
                 <option value="Arial">Arial</option>
                 <option value="Tahoma">Tahoma</option>
                 <option value="Courier New">Courier New</option>
-                <option value="Cairo">Cairo</option>
-                <option value="Tajawal">Tajawal</option>
-                <option value="Amiri">Amiri</option>
-                <option value="Noto Kufi Arabic">Noto Kufi Arabic</option>
             </select>
             
-            <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-            <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-            <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
-            <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic&display=swap" rel="stylesheet">
 
             <label for="themeSelector">المظاهر:</label>
             <select id="themeSelector" onchange="changeTheme(this.value)">
@@ -554,12 +564,124 @@ a:hover {
     <div id="notification" class="hidden" aria-live="polite" aria-atomic="true"></div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-    const visited = localStorage.getItem('visited');
-    if (!visited) {
-        localStorage.setItem('visited', 'true');
-        window.location.href = 'webs.html';
+    state.sites = JSON.parse(localStorage.getItem('sites')) || [];
+    state.gridColumns = localStorage.getItem('gridColumns') || 2;
+    state.darkMode = localStorage.getItem('darkMode') === 'enabled';
+
+    elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
+    elements.gridSelect.value = state.gridColumns;
+
+    if (state.darkMode) {
+        elements.body.classList.add('dark-mode');
     }
+
+    loadSettings();
+    loadSites();
+    updateStats();
+    animateCards();
+    handleScrollAnimation();
+
+    elements.clearDataBtn.addEventListener('click', clearAllData);
+    elements.gridSelect.addEventListener('change', updateGridColumns);
+    document.getElementById('searchForm').addEventListener('submit', handleSearchSubmit);
+    window.addEventListener('scroll', handleScrollAnimation);
 });
+
+function clearAllData(e) {
+    e.preventDefault();
+    if (confirm("هل أنت متأكد أنك تريد حذف جميع البيانات؟")) {
+        localStorage.removeItem('sites');
+        state.sites = [];
+        loadSites();
+    }
+}
+
+function updateGridColumns(e) {
+    state.gridColumns = e.target.value;
+    elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
+    localStorage.setItem('gridColumns', state.gridColumns);
+}
+
+function handleSearchSubmit(event) {
+    event.preventDefault();
+    const searchInput = this.querySelector('input[name="q"]').value.trim();
+    if (searchInput) {
+        addSearchTerm(searchInput);
+        this.submit();
+    }
+}
+function saveDataToLocalStorage(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+        console.error("خطأ أثناء حفظ البيانات في localStorage:", error);
+    }
+}
+
+function getDataFromLocalStorage(key, defaultValue = []) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : defaultValue;
+    } catch (error) {
+        console.error("خطأ أثناء استرجاع البيانات من localStorage:", error);
+        return defaultValue;
+    }
+}
+
+function saveSites() {
+    saveDataToLocalStorage('sites', state.sites);
+}
+
+function loadSites() {
+    state.sites = getDataFromLocalStorage('sites');
+    elements.container.innerHTML = '';
+    state.sites.forEach((site, index) => addSiteCard(site, index));
+}
+
+function addSiteFromPopup() {
+    const siteName = elements.popupSiteName.value.trim();
+    const siteURL = elements.popupSiteURL.value.trim();
+    if (!siteName || !siteURL) return;
+
+    const newSite = { name: siteName, url: siteURL, visits: 0 };
+    state.sites.push(newSite);
+    saveSites();
+    addSiteCard(newSite, state.sites.length - 1);
+    elements.popupSiteName.value = '';
+    elements.popupSiteURL.value = '';
+    hidePopup();
+    updateStats();
+    showNotification("تم إضافة الموقع بنجاح!");
+}
+function animateCards() {
+    const cards = document.querySelectorAll('.site-card');
+    cards.forEach((card, index) => {
+        setTimeout(() => card.classList.add('visible'), index * 100);
+    });
+}
+function handleScrollAnimation() {
+    const cards = document.querySelectorAll('.site-card');
+    const windowHeight = window.innerHeight;
+
+    cards.forEach(card => {
+        const cardTop = card.getBoundingClientRect().top;
+        if (cardTop < windowHeight - 50) {
+            card.classList.add('in-view');
+        }
+    });
+}
+function showPopup() {
+    elements.popupForm.classList.add('show');
+    elements.popupForm.style.display = 'flex';
+}
+
+function hidePopup() {
+    elements.popupForm.classList.remove('show');
+    setTimeout(() => {
+        elements.popupForm.style.display = 'none';
+    }, 300);
+}
+
     const state = {
         sites: [],
         darkMode: false,
@@ -572,7 +694,6 @@ a:hover {
         popupForm: document.getElementById('popupForm'),
         popupSiteName: document.getElementById('popupSiteName'),
         popupSiteURL: document.getElementById('popupSiteURL'),
-        darkModeToggle: document.getElementById('darkModeToggle'),
         gridSelect: document.getElementById('gridSelect'),
         clearDataBtn: document.getElementById('clearData'),
         notification: document.getElementById('notification'),
@@ -623,72 +744,6 @@ function deleteSite(index) {
     }
 }
 
-function loadSites() {
-    state.sites = JSON.parse(localStorage.getItem('sites')) || [];
-
-    const urlPattern = /^(https?:\/\/\S+)/;
-    state.sites = state.sites.filter(site => urlPattern.test(site.url.trim()) && site.url.trim().length > 8);
-    localStorage.setItem('sites', JSON.stringify(state.sites));
-
-    elements.container.innerHTML = '';
-
-    state.sites.forEach((site, index) => {
-        const siteCard = document.createElement('div');
-        siteCard.className = 'site-card';
-
-        const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
-        siteCard.innerHTML = `
-            <div class="icon-buttons">
-                <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
-                <input type="file" id="fileInput${index}" style="display: none;" accept="image/*" onchange="updateImage(${index}, event)">
-                <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
-            </div>
-            <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
-                <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy" 
-                onerror="this.onerror=null;this.src='default-image.png';">
-                <p>${site.name}</p>
-            </a>
-        `;
-
-        elements.container.appendChild(siteCard);
-    });
-}
-
-    function debounce(func, delay) {
-        let timer;
-        return function(...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-
-    function showPopup() {
-        elements.popupForm.style.display = 'flex';
-    }
-
-    function hidePopup() {
-        elements.popupForm.style.display = 'none';
-    }
-
-    function addSiteFromPopup() {
-        const siteName = elements.popupSiteName.value.trim();
-        const siteURL = elements.popupSiteURL.value.trim();
-        
-        if (!siteName || !siteURL) return;
-
-        const newSite = { name: siteName, url: siteURL, visits: 0 };
-        state.sites.push(newSite);
-        localStorage.setItem('sites', JSON.stringify(state.sites));
-
-        addSiteCard(newSite, state.sites.length - 1);
-
-        elements.popupSiteName.value = '';
-        elements.popupSiteURL.value = '';
-        hidePopup();
-        updateStats();
-        showNotification("تم إضافة الموقع بنجاح!");
-    }
-
     function addSiteCard(site, index) {
         const siteCard = document.createElement('div');
         siteCard.className = 'site-card';
@@ -708,7 +763,6 @@ function loadSites() {
 
         elements.container.appendChild(siteCard);
     }
-    
 
     function toggleDropdown() {
         const dropdownContent = document.getElementById('dropdownContent');
@@ -741,22 +795,6 @@ function loadSites() {
             state.sites = [];
             loadSites();
         }
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        state.sites = JSON.parse(localStorage.getItem('sites')) || [];
-        state.gridColumns = localStorage.getItem('gridColumns') || 2;
-        state.darkMode = localStorage.getItem('darkMode') === 'enabled';
-
-        elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
-        elements.gridSelect.value = state.gridColumns;
-        
-        if (state.darkMode) {
-            elements.body.classList.add('dark-mode');
-            elements.darkModeToggle.querySelector('i').className = 'fas fa-sun';
-        }
-        updateStats();
-        loadSites();
     });
 
     document.addEventListener('keydown', (e) => {
@@ -941,64 +979,6 @@ function closeSettings() {
     const popup = document.getElementById('settingsPopup');
     if (popup) popup.classList.add('hidden');
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadSettings();
-    loadSites();
-    
-    const fontSelect = document.getElementById('fontSelect');
-    if (fontSelect) {
-        fontSelect.addEventListener('change', (e) => {
-            updateFontFamily(e.target.value);
-        });
-    }
-
-    const themeSelect = document.getElementById('themeSelect');
-    if (themeSelect) {
-        themeSelect.addEventListener('change', (e) => {
-            changeTheme(e.target.value);
-        });
-    }
-
-    const layoutButtons = document.querySelectorAll('.layout-button');
-    layoutButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            layoutButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            saveSettings({
-                ...getCurrentSettings(),
-                layout: button.dataset.layout
-            });
-        });
-    });
-
-    const popup = document.getElementById('settingsPopup');
-    if (popup) {
-        popup.addEventListener('click', (event) => {
-            if (event.target === popup) {
-                closeSettings();
-            }
-        });
-    }
-
-    const searchForm = document.getElementById('searchForm');
-    if (searchForm) {
-        searchForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const searchInput = this.querySelector('input[name="q"]');
-            if (searchInput && searchInput.value.trim()) {
-                const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-                searchHistory.push(searchInput.value.trim());
-                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
-                this.submit();
-            }
-        });
-    }
-});
-const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        if (darkModeMediaQuery.matches) {
-            document.body.classList.add('deepdark');
-        }
         document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no');
         function exportData() {
     const data = {
@@ -1041,17 +1021,12 @@ function importData() {
     });
     input.click();
 }
-    document.addEventListener("DOMContentLoaded", () => {
-      const savedTheme = localStorage.getItem("theme") || "Default";
-      document.body.className = savedTheme;
-      document.getElementById("theme").value = savedTheme;
-    });
-
     document.getElementById("theme").addEventListener("change", (event) => {
       const selectedTheme = event.target.value;
       document.body.className = selectedTheme;
       localStorage.setItem("theme", selectedTheme);
     });
+
 </script>
 </body>
 </html>

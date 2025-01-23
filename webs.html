@@ -44,6 +44,7 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
+      transition: transform 0.2s ease, background-color 0.3s ease;
     }
 
     select {
@@ -64,8 +65,14 @@
         position: relative;
         cursor: pointer;
         border-radius: 8px;
-        transition: transform 0.2s, box-shadow 0.2s;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
     }
+    .site-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 .site-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px var(--shadow-color);
@@ -280,6 +287,7 @@
             window.location.href = 'index.html';
         }
     document.addEventListener('DOMContentLoaded', () => {
+      animateCards();
         const savedTheme = localStorage.getItem('userSettings');
         if (savedTheme) {
             const settings = JSON.parse(savedTheme);
@@ -288,6 +296,8 @@
         document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem("theme") || "default";
     applyTheme(savedTheme);
+      document.body.className = savedTheme;
+      document.getElementById("theme").value = savedTheme;
     });
 });
     const sites = [
@@ -305,13 +315,12 @@
     { "name": "TikTok", "url": "https://www.tiktok.com/" , "image": "" },
     { "name": "Reddit", "url": "https://www.reddit.com/" , "image": "" },
     { "name": "github", "url": "https://github.com/" , "image": "" },
-    { "name": "Snapchat", "url": "https://www.snapchat.com/" , "image": "" },
     { "name": "Instagram", "url": "https://www.instagram.com/" , "image": "" },
     { "name": "Netflix", "url": "https://www.netflix.com/" , "image": "" },
     { "name": "Wikipedia", "url": "https://www.wikipedia.org/" , "image": "" },
     { "name": "الخرائط", "url": "https://www.google.com/maps" , "image": "img/map.png" },
     { "name": "مترجم", "url": "https://translate.google.com/?hl=ar&sl=en&tl=ar&op=translate" },
-    { "name": "Fmhy", "url": "https://fmhy.net/" },
+    { "name": "الورد", "url": "https://arwordle.netlify.app/" },
     { "name": "YouTube", "url": "https://youtube.com" },
     { "name": "WhatsApp", "url": "https://web.whatsapp.com/" },
     { "name": "Google", "url": "https://www.google.com" }
@@ -334,17 +343,17 @@ sites.forEach(site => {
     
     container.insertAdjacentHTML('beforeend', siteCard);
 });
-    document.addEventListener("DOMContentLoaded", () => {
-      const savedTheme = localStorage.getItem("theme") || "Default";
-      document.body.className = savedTheme;
-      document.getElementById("theme").value = savedTheme;
-    });
-
     document.getElementById("theme").addEventListener("change", (event) => {
       const selectedTheme = event.target.value;
       document.body.className = selectedTheme;
       localStorage.setItem("theme", selectedTheme);
     });
+    function animateCards() {
+    const cards = document.querySelectorAll('.site-card');
+    cards.forEach((card, index) => {
+        setTimeout(() => card.classList.add('visible'), index * 100);
+    });
+}
   </script>
 </body>
 </html>
