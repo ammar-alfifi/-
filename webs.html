@@ -271,21 +271,34 @@
 
     window.addEventListener("DOMContentLoaded", loadSettings);
     function saveSelectedSites() {
-        const selectedSites = [];
-        document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
-            const siteName = checkbox.nextElementSibling.querySelector('p').textContent;
-            const siteUrl = checkbox.value;
-            const siteImage = checkbox.nextElementSibling.querySelector('img').src;
+    const selectedSites = [];
+    document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+        const card = checkbox.closest('.site-card');
+        const siteName = card.querySelector('p').textContent;
+        const siteUrl = checkbox.value;
+        const siteImage = card.querySelector('img').src;
 
-            selectedSites.push({ name: siteName, url: siteUrl, image: siteImage });
+        selectedSites.push({ 
+            name: siteName, 
+            url: siteUrl, 
+            image: siteImage,
+            visits: 0
         });
+    });
 
-            const existingSites = JSON.parse(localStorage.getItem('sites')) || [];
-            const updatedSites = [...existingSites, ...selectedSites];
-            localStorage.setItem('sites', JSON.stringify(updatedSites));
-            alert('تم حفظ المواقع بنجاح!');
-            window.location.href = 'index.html';
-        }
+    const existingSites = JSON.parse(localStorage.getItem('sites')) || [];
+    const updatedSites = [...existingSites, ...selectedSites];
+    
+    const uniqueSites = updatedSites.filter((site, index, self) =>
+        index === self.findIndex((t) => (
+            t.url === site.url && t.name === site.name
+        ))
+    );
+    
+    localStorage.setItem('sites', JSON.stringify(uniqueSites));
+    alert('تم حفظ المواقع بنجاح!');
+    window.location.href = 'index.html';
+}
     document.addEventListener('DOMContentLoaded', () => {
       animateCards();
         const savedTheme = localStorage.getItem('userSettings');

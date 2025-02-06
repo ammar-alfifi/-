@@ -469,6 +469,11 @@ a:hover {
     transform: scale(1.05);
     transition: transform 0.2s ease;
 }
+.editing-effect {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
 
     </style>
 </head>
@@ -480,10 +485,11 @@ a:hover {
             <label for="fontFamily">خط النص:</label>
             <select id="fontFamily" onchange="updateFontFamily(this.value)">
                 <option value="Arial">Arial</option>
-                <option value="Tahoma">Tahoma</option>
-                <option value="Courier New">Courier New</option>
+                <option value="Noto Kufi Arabic">Kufi</option>
+                <option value="Amiri">Amiri</option>
             </select>
-            
+            <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic&display=swap" rel="stylesheet">
 
             <label for="themeSelector">المظاهر:</label>
             <select id="themeSelector" onchange="changeTheme(this.value)">
@@ -564,8 +570,12 @@ a:hover {
     <div id="notification" class="hidden" aria-live="polite" aria-atomic="true"></div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        if (!localStorage.getItem("visitedBefore")) {
+        localStorage.setItem("visitedBefore", "true");
+        window.location.href = "webs.html";
+    }
     state.sites = JSON.parse(localStorage.getItem('sites')) || [];
-    state.gridColumns = localStorage.getItem('gridColumns') || 2;
+    state.gridColumns = localStorage.getItem('gridColumns') || 3;
     state.darkMode = localStorage.getItem('darkMode') === 'enabled';
 
     elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
@@ -580,6 +590,7 @@ a:hover {
     updateStats();
     animateCards();
     handleScrollAnimation();
+    updateSearchHistory();
 
     elements.clearDataBtn.addEventListener('click', clearAllData);
     elements.gridSelect.addEventListener('change', updateGridColumns);
@@ -898,7 +909,30 @@ function saveSettings(settings) {
         showNotification('حدث خطأ أثناء حفظ الإعدادات');
     }
 }
-
+function updateSearchHistory() {
+    const recentSearchesContainer = document.getElementById('recentSites');
+    recentSearchesContainer.innerHTML = "";
+    
+    const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    
+    const recentSearchTerms = [...new Set(searchHistory.slice(-3).reverse())];
+    
+    const maxLength = 10;
+    
+    recentSearchTerms.forEach(searchTerm => {
+        const displayText = searchTerm.length > maxLength 
+                            ? searchTerm.substr(0, maxLength) + "..." 
+                            : searchTerm;
+                            
+        const searchLink = document.createElement('a');
+        searchLink.href = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
+        searchLink.textContent = displayText;
+        searchLink.style.margin = "0 5px";
+        searchLink.style.cursor = "pointer";
+        searchLink.target = "_blank";
+        recentSearchesContainer.appendChild(searchLink);
+    });
+}
 function loadSettings() {
     try {
         const savedSettings = localStorage.getItem('userSettings');
@@ -1021,12 +1055,175 @@ function importData() {
     });
     input.click();
 }
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById("siteContainer");
+    let editMode = false;
+    let touchTimer;
+    const longPressDuration = 500;
+    const moveThreshold = 10;   
+    let startX = 0, startY = 0;
+    let moved = false;
+    let sortable;
+
+    function initializeSortable() {
+    if (sortable) sortable.destroy();
+    sortable = new Sortable(container, {
+        animation: 150,
+        ghostClass: "sortable-ghost",
+        dragClass: "dragging",
+        preventOnFilter: false,
+        disabled: !editMode,
+        fallbackOnBody: true,
+        scroll: true,
+        onStart: function (evt) {
+            evt.item.classList.add("dragging");
+        },
+        onEnd: function (evt) {
+            evt.item.classList.remove("dragging");
+            saveNewOrder();
+        }
+    });
+}
+
+    function saveNewOrder() {
+        const newOrder = Array.from(container.children).map(child => {
+            const p = child.querySelector("p");
+            if (!p) return null;
+            const siteName = p.textContent;
+            return state.sites.find(site => site.name === siteName);
+        }).filter(site => site);
+        state.sites = newOrder;
+        saveSites();
+    }
+
+    container.addEventListener("touchstart", (e) => {
+        if (e.touches.length !== 1) return;
+        moved = false;
+        startX = e.touches[0].pageX;
+        startY = e.touches[0].pageY;
+        touchTimer = setTimeout(() => {
+            if (!moved) {
+                enableEditMode();
+            }
+        }, longPressDuration);
+    });
+
+    container.addEventListener("touchmove", (e) => {
+        const dx = e.touches[0].pageX - startX;
+        const dy = e.touches[0].pageY - startY;
+        if (Math.sqrt(dx * dx + dy * dy) > moveThreshold) {
+            moved = true;
+            clearTimeout(touchTimer);
+        }
+    });
+
+    container.addEventListener("touchend", () => {
+        clearTimeout(touchTimer);
+    });
+
+    container.addEventListener("mousedown", (e) => {
+        moved = false;
+        startX = e.pageX;
+        startY = e.pageY;
+        touchTimer = setTimeout(() => {
+            if (!moved) {
+                enableEditMode();
+            }
+        }, longPressDuration);
+    });
+
+    container.addEventListener("mousemove", (e) => {
+        if (!touchTimer) return;
+        const dx = e.pageX - startX;
+        const dy = e.pageY - startY;
+        if (Math.sqrt(dx * dx + dy * dy) > moveThreshold) {
+            moved = true;
+            clearTimeout(touchTimer);
+        }
+    });
+
+    container.addEventListener("mouseup", () => {
+        clearTimeout(touchTimer);
+    });
+
+    function enableEditMode() {
+        if (editMode) return;
+        editMode = true;
+        document.body.classList.add("edit-mode");
+
+        document.querySelectorAll(".site-card").forEach(card => {
+            card.classList.add("editing-effect");
+            card.querySelectorAll(".icon-button").forEach(btn => {
+                btn.style.display = "inline-block";
+            });
+        });
+
+        initializeSortable();
+        showDoneButton();
+    }
+
+    function disableEditMode() {
+        editMode = false;
+        document.body.classList.remove("edit-mode");
+
+        document.querySelectorAll(".site-card").forEach(card => {
+            card.classList.remove("editing-effect");
+            card.querySelectorAll(".icon-button").forEach(btn => {
+                btn.style.display = "none";
+            });
+        });
+
+        initializeSortable();
+        hideDoneButton();
+    }
+
+    function showDoneButton() {
+        let doneButton = document.getElementById("doneButton");
+        if (!doneButton) {
+            doneButton = document.createElement("button");
+            doneButton.id = "doneButton";
+            doneButton.textContent = "تم";
+            doneButton.style.position = "fixed";
+            doneButton.style.top = "10px";
+            doneButton.style.right = "10px";
+            doneButton.style.padding = "10px 15px";
+            doneButton.style.fontSize = "16px";
+            doneButton.style.background = "#2e2e2e";
+            doneButton.style.color = "white";
+            doneButton.style.border = "none";
+            doneButton.style.borderRadius = "5px";
+            doneButton.style.cursor = "pointer";
+            document.body.appendChild(doneButton);
+            doneButton.addEventListener("click", disableEditMode);
+        }
+    }
+
+    function hideDoneButton() {
+        const doneButton = document.getElementById("doneButton");
+        if (doneButton) {
+            doneButton.remove();
+        }
+    }
+
+    initializeSortable();
+    document.querySelectorAll(".icon-button").forEach(btn => {
+        btn.style.display = "none";
+    });
+});
+document.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("theme") || "Default";
+      document.body.className = savedTheme;
+      document.getElementById("theme").value = savedTheme;
+    });
+
     document.getElementById("theme").addEventListener("change", (event) => {
       const selectedTheme = event.target.value;
       document.body.className = selectedTheme;
       localStorage.setItem("theme", selectedTheme);
     });
-
 </script>
+
 </body>
 </html>
