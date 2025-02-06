@@ -460,10 +460,18 @@ a:hover {
     --accent-color: #87a8c5;
 }
 @media screen and (max-width: 437px) {
-            body {
-                font-size: 14px;
-            }
-        }
+    .site-card {
+        width: 100px;
+    }
+    .site-card img {
+        width: 100px;
+        height: 100px;
+    }
+    .dropdown {
+        top: 15px;
+        left: 10px;
+    }
+}
         .dragging {
     opacity: 0.8;
     transform: scale(1.05);
@@ -474,7 +482,13 @@ a:hover {
     filter: brightness(1.1);
     transition: transform 0.2s ease, filter 0.2s ease;
 }
-
+html {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+body {
+    touch-action: pan-y;
+}
     </style>
 </head>
 <body>
@@ -488,9 +502,8 @@ a:hover {
                 <option value="Noto Kufi Arabic">Kufi</option>
                 <option value="Amiri">Amiri</option>
             </select>
-            <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
-            <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
             <label for="themeSelector">المظاهر:</label>
             <select id="themeSelector" onchange="changeTheme(this.value)">
                 <option value="root">Default</option>
@@ -569,12 +582,24 @@ a:hover {
     <a href="#" id="clearData" style="position: fixed; bottom: 10px; left: 10px; color: var(--primary-color); text-decoration: underline;" aria-label="حذف البيانات">حذف البيانات</a>
     <div id="notification" class="hidden" aria-live="polite" aria-atomic="true"></div>
 <script>
+    if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('تم تسجيل الـ Service Worker بنجاح:', registration);
+      })
+      .catch(error => {
+        console.log('فشل تسجيل الـ Service Worker:', error);
+      });
+  });
+}
     document.addEventListener('DOMContentLoaded', () => {
-        if (!localStorage.getItem("visitedBefore")) {
-        localStorage.setItem("visitedBefore", "true");
-        window.location.href = "webs.html";
-    }
+if (!localStorage.getItem("visitedBefore")) {
+    localStorage.setItem("visitedBefore", "true");
+    window.location.href = "webs.html";
+} else {
     state.sites = JSON.parse(localStorage.getItem('sites')) || [];
+    }
     state.gridColumns = localStorage.getItem('gridColumns') || 3;
     state.darkMode = localStorage.getItem('darkMode') === 'enabled';
 
@@ -759,8 +784,7 @@ function deleteSite(index) {
         const siteCard = document.createElement('div');
         siteCard.className = 'site-card';
 
-        const imageSrc = site.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(site.url).hostname}`;
-        siteCard.innerHTML = `
+        const imageSrc = site.image || `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${site.url}&size=64`;        siteCard.innerHTML = `
             <div class="icon-buttons">
                 <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
                 <input type="file" id="fileInput${index}" style="display: none;" accept="image/*" onchange="updateImage(${index}, event)">
@@ -813,7 +837,11 @@ function deleteSite(index) {
             hidePopup();
         }
     });
-
+    document.getElementById('popupSiteURL').addEventListener('blur', function(e) {
+    if (!this.value.startsWith('http')) {
+        this.value = 'https://' + this.value;
+    }
+});
     function updateStats() {
     const totalSites = state.sites.length;
     elements.totalSites.textContent = totalSites;
@@ -1002,6 +1030,9 @@ function showNotification(message) {
             notification.classList.add('hidden');
         }, 3000);
     }
+    notification.style.right = '20px';
+notification.style.left = 'auto';
+notification.style.backgroundColor = 'var(--primary-color)';
 }
 
 function openSettings() {
@@ -1055,8 +1086,6 @@ function importData() {
     });
     input.click();
 }
-</script>
-<script>
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("siteContainer");
     let editMode = false;
