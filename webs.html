@@ -132,14 +132,16 @@
   <div class="card">
     <h2>اختر المظهر</h2>
     <div class="theme-buttons">
-        <button data-theme="default" class="theme-button" onclick="applyTheme('default')">Default</button>
-        <button data-theme="deepdark">Deep Dark</button>
-      <button data-theme="greendark">Green Dark</button>
-      <button data-theme="purpledark">Purple Dark</button>
-      <button data-theme="firefoxdark">Firefox Dark</button>
-      <button data-theme="orangedark">Orange Dark</button>
-      <button data-theme="arcdark">Arc Dark</button>
-    </div>
+      <button data-theme="default" class="theme-button" onclick="applyTheme('default')">Default</button>
+      <button data-theme="DesertNight" class="theme-button" onclick="applyTheme('DesertNight')">Desert Night</button>
+      <button data-theme="deepdark" class="theme-button" onclick="applyTheme('deepdark')">Deep Dark</button>
+      <button data-theme="greendark" class="theme-button" onclick="applyTheme('greendark')">Green Dark</button>
+      <button data-theme="purpledark" class="theme-button" onclick="applyTheme('purpledark')">Purple Dark</button>
+      <button data-theme="firefoxdark" class="theme-button" onclick="applyTheme('firefoxdark')">Firefox Dark</button>
+      <button data-theme="orangedark" class="theme-button" onclick="applyTheme('orangedark')">Orange Dark</button>
+      <button data-theme="arcdark" class="theme-button" onclick="applyTheme('arcdark')">Arc Dark</button>
+      <button data-theme="cozy-night" class="theme-button" onclick="applyTheme('cozy-night')">Cozy Night</button>
+  </div>
   </div>
   <h1>أختر مفضلتك</h1>
   <div class="container" id="siteContainer"></div>
@@ -159,7 +161,7 @@
    "--search-bar-bg": "#cfcfcf",
    "--accent-color": "#8b8b8b",
 },
-      deepdark: {
+    deepdark: {
         "--bg-color": "#121212",
         "--text-color": "#e0e0e0",
         "--card-bg": "#1e1e1e",
@@ -170,9 +172,9 @@
         "--input-text": "#e0e0e0",
         "--placeholder-color": "#575757",
         "--search-bar-bg": "#1a1a1a",
-        "--accent-color": "#9a9a9a",
-      },
-      greendark: {
+        "--accent-color": "#9a9a9a"
+    },
+    greendark: {
         "--bg-color": "#1f2f1f",
         "--text-color": "#d4f0c0",
         "--card-bg": "#2a3a2a",
@@ -183,9 +185,9 @@
         "--input-text": "#d4f0c0",
         "--placeholder-color": "#6b8f6b",
         "--search-bar-bg": "#263526",
-        "--accent-color": "#98e0a3",
-      },
-      purpledark: {
+        "--accent-color": "#98e0a3"
+    },
+    purpledark: {
         "--bg-color": "#2b1a3d",
         "--text-color": "#e5d4ff",
         "--card-bg": "#3c2554",
@@ -196,9 +198,9 @@
         "--input-text": "#e5d4ff",
         "--placeholder-color": "#876595",
         "--search-bar-bg": "#351e4a",
-        "--accent-color": "#c59fe3",
-      },
-      firefoxdark: {
+        "--accent-color": "#c59fe3"
+    },
+    firefoxdark: {
         "--bg-color": "#202020",
         "--text-color": "#e0e0e0",
         "--card-bg": "#292929",
@@ -209,9 +211,9 @@
         "--input-text": "#f0f0f0",
         "--placeholder-color": "#777777",
         "--search-bar-bg": "#262626",
-        "--accent-color": "#ff6e40",
-      },
-      orangedark: {
+        "--accent-color": "#ff6e40"
+    },
+    orangedark: {
         "--bg-color": "#402d1c",
         "--text-color": "#ffdab5",
         "--card-bg": "#513720",
@@ -222,21 +224,47 @@
         "--input-text": "#ffe7cc",
         "--placeholder-color": "#a97d62",
         "--search-bar-bg": "#4a341f",
-        "--accent-color": "#ffab87",
-      },
-      arcdark: {
-        "--bg-color": "#3a4252",
-        "--text-color": "#eceff4",
-        "--card-bg": "#424c5e",
-        "--shadow-color": "rgba(0, 0, 0, 0.3)",
-        "--primary-color": "#6b8fbb",
-        "--primary-hover": "#5879a1",
-        "--input-bg": "#4b566a",
-        "--input-text": "#f0f4f8",
-        "--placeholder-color": "#b0b9c2",
-        "--search-bar-bg": "#3a4252",
-        "--accent-color": "#87a8c5",
-      },
+        "--accent-color": "#ffab87"
+    },
+    arcdark: {
+        "--bg-color": "#2d3440",
+        "--text-color": "#e5e9f0",
+        "--card-bg": "#3b4252",
+        "--shadow-color": "rgba(34, 39, 50, 0.4)",
+        "--primary-color": "#81a1c1",
+        "--primary-hover": "#5e81ac",
+        "--input-bg": "#434c5e",
+        "--input-text": "#d8dee9",
+        "--placeholder-color": "#8f99ab",
+        "--search-bar-bg": "#3b4252",
+        "--accent-color": "#88c0d0"
+    },
+    "cozy-night": {
+        "--bg-color": "#2D3250",
+        "--text-color": "#F8F6F4",
+        "--card-bg": "#424769",
+        "--shadow-color": "rgba(0, 0, 0, 0.2)",
+        "--primary-color": "#19A7CE",
+        "--primary-hover": "#146C94",
+        "--input-bg": "#363C6B",
+        "--input-text": "#FFFFFF",
+        "--placeholder-color": "#A6A9C8",
+        "--search-bar-bg": "#424769",
+        "--accent-color": "#FF9EAA"
+    },
+    DesertNight: {
+        "--bg-color": "#e1b382",
+        "--text-color": "#12343b",
+        "--card-bg": "#d1a66a",
+        "--shadow-color": "rgba(0, 0, 0, 0.25)",
+        "--primary-color": "#2d545e",
+        "--primary-hover": "#24504f",
+        "--input-bg": "#e8cfa2",
+        "--input-text": "#12343b",
+        "--placeholder-color": "#9c6a35",
+        "--search-bar-bg": "#d1a66a",
+        "--accent-color": "#2d545e"
+},
     };
 
     const root = document.documentElement;

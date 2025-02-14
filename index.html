@@ -43,6 +43,8 @@ a:hover {
         min-height: 100vh;
         transition: background-color 0.3s ease, color 0.3s ease;
         overflow-x: hidden;
+        touch-action: pan-y;
+        will-change: transform;
     }
 
         .container {
@@ -389,7 +391,6 @@ a:hover {
     --search-bar-bg: #1a1a1a;
     --accent-color: #9a9a9a;
 }
-
 .greendark {
     --bg-color: #1f2f1f;
     --text-color: #d4f0c0;
@@ -403,7 +404,6 @@ a:hover {
     --search-bar-bg: #263526;
     --accent-color: #98e0a3;
 }
-
 .purpledark {
     --bg-color: #2b1a3d;
     --text-color: #e5d4ff;
@@ -417,7 +417,6 @@ a:hover {
     --search-bar-bg: #351e4a;
     --accent-color: #c59fe3;
 }
-
 .firefoxdark {
     --bg-color: #202020;
     --text-color: #e0e0e0;
@@ -431,7 +430,6 @@ a:hover {
     --search-bar-bg: #262626;
     --accent-color: #ff6e40;
 }
-
 .orangedark {
     --bg-color: #402d1c;
     --text-color: #ffdab5;
@@ -445,20 +443,45 @@ a:hover {
     --search-bar-bg: #4a341f;
     --accent-color: #ffab87;
 }
-
 .arcdark {
-    --bg-color: #3a4252;
-    --text-color: #eceff4;
-    --card-bg: #424c5e;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --primary-color: #6b8fbb;
-    --primary-hover: #5879a1;
-    --input-bg: #4b566a;
-    --input-text: #f0f4f8;
-    --placeholder-color: #b0b9c2;
-    --search-bar-bg: #3a4252;
-    --accent-color: #87a8c5;
+    --bg-color:         #2d3440;
+    --text-color:       #e5e9f0;  
+    --card-bg:          #3b4252;  
+    --shadow-color:     rgba(34, 39, 50, 0.4); 
+    --primary-color:    #81a1c1; 
+    --primary-hover:    #5e81ac;    
+    --input-bg:         #434c5e;  
+    --input-text:       #d8dee9;
+    --placeholder-color:#8f99ab;  
+    --search-bar-bg:    #3b4252; 
+    --accent-color:     #88c0d0;  
 }
+.cozy-night{
+    --bg-color:         #2D3250;
+    --text-color:       #F8F6F4;  
+    --card-bg:          #424769; 
+    --shadow-color:     rgba(0, 0, 0, 0.2);  
+    --primary-color:    #19A7CE; 
+    --primary-hover:    #146C94;
+    --input-bg:         #363C6B; 
+    --input-text:       #FFFFFF; 
+    --placeholder-color:#A6A9C8; 
+    --search-bar-bg:    #424769; 
+    --accent-color:     #FF9EAA;
+}
+.DesertNight{
+    --bg-color:         #e1b382;
+    --text-color:       #12343b;  
+    --card-bg:          #d1a66a; 
+    --shadow-color:     rgba(0, 0, 0, 0.25);  
+    --primary-color:    #2d545e; 
+    --primary-hover:    #24504f;
+    --input-bg:         #e8cfa2; 
+    --input-text:       #12343b; 
+    --placeholder-color:#9c6a35; 
+    --search-bar-bg:    #d1a66a; 
+    --accent-color:     #2d545e;
+  }
 @media screen and (max-width: 437px) {
     .site-card {
         width: 100px;
@@ -468,7 +491,7 @@ a:hover {
         height: 100px;
     }
     .dropdown {
-        top: 15px;
+        top: 25px;
         left: 10px;
     }
 }
@@ -485,9 +508,6 @@ a:hover {
 html {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-}
-body {
-    touch-action: pan-y;
 }
     </style>
 </head>
@@ -513,8 +533,12 @@ body {
                 <option value="firefoxdark">Firefox Dark</option>
                 <option value="orangedark">Orange Dark</option>
                 <option value="arcdark">Arc Dark</option>
+                <option value="DesertNight">Desert Night</option>
+                <option value="cozy-night">Cozy Night</option>
+                <option value="nature-light">Nature Light</option>
+                <option value="warm-earth">Warm Earth</option>
+                <option value="pastel-cloud">Pastel Cloud</option>
             </select>
-
             <label for="gridSelect">التخطيط:</label>
             <select id="gridSelect">
         <option value="2">2x1</option>
@@ -928,7 +952,11 @@ const defaultSettings = {
     theme: 'default',
     layout: '3x1'
 };
-
+function saveSettings() {
+    const currentTheme = document.querySelector("button[data-theme].active").dataset.theme;
+    localStorage.setItem("theme", currentTheme);
+    showNotification("تم حفظ الإعدادات بنجاح!");
+}
 function saveSettings(settings) {
     try {
         localStorage.setItem('userSettings', JSON.stringify(settings));
@@ -994,6 +1022,7 @@ function changeTheme(theme) {
         ...getCurrentSettings(),
         theme: theme
     });
+    localStorage.setItem('theme', theme);
 }
 
 function updateFontFamily(font) {
@@ -1077,9 +1106,9 @@ function importData() {
                 if (importedData.settings) {
                     applySettings(importedData.settings);
                 }
-                alert("تم استيراد البيانات بنجاح!");
+                showNotification("تم استيراد البيانات بنجاح!");
             } catch (error) {
-                alert("فشل استيراد البيانات! يرجى التأكد من صحة الملف.");
+                showNotification("فشل استيراد البيانات! يرجى التأكد من صحة الملف.");
             }
         };
         reader.readAsText(file);
@@ -1253,6 +1282,5 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("theme", selectedTheme);
     });
 </script>
-
 </body>
 </html>
