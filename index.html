@@ -1,1283 +1,157 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإعدادات المتقدمة</title>
     <style>
-        a {
-    color: inherit;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-    color: inherit;
-}
-
-:root {
-    --bg-color: #ffffff;
-    --text-color: #1a1a1a;
-    --card-bg: #cfcfcf;
-    --shadow-color: rgba(0, 0, 0, 0.05);
-    --primary-color: #2e2e2e;
-    --primary-hover: #2e2e2e;
-    --input-bg: #f5f5f5;
-    --input-text: #2e2e2e;
-    --placeholder-color: #7a7a7a;
-    --search-bar-bg: #cfcfcf;
-    --accent-color: #8b8b8b;
-}
+        :root {
+            --primary-color: #2e2e2e;
+            --hover-color: #4a4a4a;
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+        }
 
         body {
-        font-family: 'Arial', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        transition: background-color 0.3s ease, color 0.3s ease;
-        overflow-x: hidden;
-        touch-action: pan-y;
-        will-change: transform;
-    }
-
-        .container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 20px;
-    max-width: 100%;
-    margin: 20px auto;
-    }
-
-        .site-card {
-            width: 120px;
-            text-align: center;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px var(--shadow-color);
-            background-color: var(--card-bg);
-            position: relative;
-            will-change: transform;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background 0.3s;
         }
-        .site-card.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-.site-card.in-view {
-    opacity: 1;
-    transform: translateY(0);
-}
 
-
-        .site-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px var(--shadow-color);
-    }
-
-    .site-card img {
-        width: 120px;    
-        height: 120px;
-    object-fit: cover; 
-    aspect-ratio: 1 / 1; 
-    border-radius: 8px;
-}
-
-        .site-card p {
-        padding: 10px;
-        margin: 0;
-        font-size: 1rem;
-        color: var(--text-color);
-    }
-
-        .popup-content button {
-        padding: 8px 12px;
-        border-radius: 5px;
-        border: none;
-        background-color: var(--primary-color);
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-    }
-
-        .popup-content button:hover {
-            background-color: var(--primary-hover);
-        }
-        .popup-form.show {
-    opacity: 1;
-    transform: scale(1);
-}
-
-        .popup-form {
-            opacity: 0;
-            transform: scale(0.8);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        .settings-container {
+            max-width: 600px;
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            margin-top: 50px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .button-group {
+            display: grid;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            gap: 10px;
         }
 
-        .popup-content {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
+        .action-button:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .popup-content input {
-            width: 80%;
-            padding: 8px;
-            margin: 10px 0;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            background-color: var(--input-bg);
-            color: var(--input-text);
+        .action-button i {
+            font-size: 18px;
         }
 
-        .icon-buttons {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            display: flex;
-            gap: 5px;
-            z-index: 1;
+        @media (max-width: 480px) {
+            .settings-container {
+                padding: 10px;
+            }
+            
+            .settings-card {
+                padding: 20px;
+            }
+            
+            .action-button {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
         }
-
-        .icon-button {
-            background-color: rgba(255, 255, 255, 0.8);
-            border: none;
-            border-radius: 50%;
-            padding: 5px;
-            cursor: pointer;
-            color: var(#333);
-            transition: transform 0.2s ease, background-color 0.3s ease;
-        }
-
-        .icon-button:hover {
-            transform: scale(1.1);
-            background-color: rgba(200, 200, 200, 0.8);
-        }
-
-        #searchBar {
-        background-color: var(--search-bar-bg);
-        border-radius: 15px;
-        padding: 8px 15px;
-        margin: 20px auto;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 110%;
-        max-width: 420px;
-    }
-
-        #searchBar input {
-        flex-grow: 1;
-        padding: 10px;
-        border: none;
-        border-radius: 15px;
-        outline: none;
-        background-color: var(--input-bg);
-        color: var(--input-text);
-        width: 175px;
-    }
-        #searchBar input::placeholder {
-            color: var(--placeholder-color);
-        }
-        #siteContainer {
-    padding-top: 10px;
-    padding-bottom: 40px;
-}
-.stats-bar {
-        background-color: var(--search-bar-bg);
-        border-radius: 10px;
-        display: flex;
-        justify-content: space-around;
-        padding: 10px;
-        margin: 10px auto;
-        width: 90%;
-        max-width: 500px;
-    }
-
-.stat {
-        text-align: center;
-        color: var(--text-color);
-        font-size: 0.9rem;
-    }
-
-.stat p {
-    margin: 0;
-    font-weight: bold;
-}
-.notification {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background-color: var(--primary-color);
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 8px;
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: opacity 0.5s, transform 0.5s;
-    z-index: 100;
-}
-
-.notification.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.notification.hidden {
-    opacity: 0;
-    transform: translateY(-20px);
-}
-#clearData {
-    transition: transform 0.2s ease;
-}
-
-#clearData:hover {
-    transform: scale(1.1);
-}
-
-
-.dropdown {
-        position: fixed;
-        top: 25px;
-        left: 20px;
-        z-index: 1000;
-    }
-
-
-    .dropdown-button {
-        background-color: var(--primary-color);
-        color: white;
-        width: 40px;
-        height: 40px;
-        border: none;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 4px var(--shadow-color);
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .dropdown-button:hover {
-        background-color: var(--primary-hover);
-        transform: scale(1.1);
-    }
-
-    .dropdown-content {
-        position: absolute;
-        top: 70px;
-        right: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 10px;
-        opacity: 0;
-        transform: translateY(-20px);
-        pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    .dropdown-content.open {
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: all;
-    }
-
-    .dropdown-content button {
-        background-color: var(--primary-color);
-        color: white;
-        width: 40px;
-        height: 40px;
-        border: none;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 4px var(--shadow-color);
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .dropdown-content button:hover {
-        background-color: var(--primary-hover);
-        transform: scale(1.1);
-    }
-    .settings-popup {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-    .hidden {
-        display: none;
-    }
-    .settings-content {
-        background-color: var(--card-bg);
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        z-index: 1001;
-    }
-
-    .settings-content h3 {
-        margin: 0;
-        color: var(--text-color);
-    }
-
-    .settings-content label {
-        font-size: 14px;
-        color: var(--text-color);
-    }
-
-    .settings-content input, .settings-content select {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        width: 100%;
-        font-size: 14px;
-        margin-bottom: 15px;
-    }
-
-    .settings-content button {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .settings-content button:hover {
-        background-color: var(--primary-hover);
-    }
-    .deepdark {
-    --bg-color: #121212;
-    --text-color: #e0e0e0;
-    --card-bg: #1e1e1e;
-    --shadow-color: rgba(0, 0, 0, 0.5);
-    --primary-color: #8e8e8e;
-    --primary-hover: #7a7a7a;
-    --input-bg: #252525;
-    --input-text: #e0e0e0;
-    --placeholder-color: #575757;
-    --search-bar-bg: #1a1a1a;
-    --accent-color: #9a9a9a;
-}
-.greendark {
-    --bg-color: #1f2f1f;
-    --text-color: #d4f0c0;
-    --card-bg: #2a3a2a;
-    --shadow-color: rgba(0, 50, 0, 0.4);
-    --primary-color: #82d48f;
-    --primary-hover: #6bb377;
-    --input-bg: #303f30;
-    --input-text: #d4f0c0;
-    --placeholder-color: #6b8f6b;
-    --search-bar-bg: #263526;
-    --accent-color: #98e0a3;
-}
-.purpledark {
-    --bg-color: #2b1a3d;
-    --text-color: #e5d4ff;
-    --card-bg: #3c2554;
-    --shadow-color: rgba(50, 0, 50, 0.4);
-    --primary-color: #b47bd8;
-    --primary-hover: #9c4fcc;
-    --input-bg: #442b59;
-    --input-text: #e5d4ff;
-    --placeholder-color: #876595;
-    --search-bar-bg: #351e4a;
-    --accent-color: #c59fe3;
-}
-.firefoxdark {
-    --bg-color: #202020;
-    --text-color: #e0e0e0;
-    --card-bg: #292929;
-    --shadow-color: rgba(0, 0, 0, 0.4);
-    --primary-color: #f78a34;
-    --primary-hover: #e76a2c;
-    --input-bg: #2f2f2f;
-    --input-text: #f0f0f0;
-    --placeholder-color: #777777;
-    --search-bar-bg: #262626;
-    --accent-color: #ff6e40;
-}
-.orangedark {
-    --bg-color: #402d1c;
-    --text-color: #ffdab5;
-    --card-bg: #513720;
-    --shadow-color: rgba(50, 25, 0, 0.4);
-    --primary-color: #ff8754;
-    --primary-hover: #e96a3d;
-    --input-bg: #5a3f28;
-    --input-text: #ffe7cc;
-    --placeholder-color: #a97d62;
-    --search-bar-bg: #4a341f;
-    --accent-color: #ffab87;
-}
-.arcdark {
-    --bg-color:         #2d3440;
-    --text-color:       #e5e9f0;  
-    --card-bg:          #3b4252;  
-    --shadow-color:     rgba(34, 39, 50, 0.4); 
-    --primary-color:    #81a1c1; 
-    --primary-hover:    #5e81ac;    
-    --input-bg:         #434c5e;  
-    --input-text:       #d8dee9;
-    --placeholder-color:#8f99ab;  
-    --search-bar-bg:    #3b4252; 
-    --accent-color:     #88c0d0;  
-}
-.cozy-night{
-    --bg-color:         #2D3250;
-    --text-color:       #F8F6F4;  
-    --card-bg:          #424769; 
-    --shadow-color:     rgba(0, 0, 0, 0.2);  
-    --primary-color:    #19A7CE; 
-    --primary-hover:    #146C94;
-    --input-bg:         #363C6B; 
-    --input-text:       #FFFFFF; 
-    --placeholder-color:#A6A9C8; 
-    --search-bar-bg:    #424769; 
-    --accent-color:     #FF9EAA;
-}
-.DesertNight{
-    --bg-color:         #e1b382;
-    --text-color:       #12343b;  
-    --card-bg:          #d1a66a; 
-    --shadow-color:     rgba(0, 0, 0, 0.25);  
-    --primary-color:    #2d545e; 
-    --primary-hover:    #24504f;
-    --input-bg:         #e8cfa2; 
-    --input-text:       #12343b; 
-    --placeholder-color:#9c6a35; 
-    --search-bar-bg:    #d1a66a; 
-    --accent-color:     #2d545e;
-  }
-@media screen and (max-width: 437px) {
-    .site-card {
-        width: 100px;
-    }
-    .site-card img {
-        width: 100px;
-        height: 100px;
-    }
-    .dropdown {
-        top: 25px;
-        left: 10px;
-    }
-}
-        .dragging {
-    opacity: 0.8;
-    transform: scale(1.05);
-    transition: transform 0.2s ease;
-}
-.editing-effect {
-    transform: scale(1.02);
-    filter: brightness(1.1);
-    transition: transform 0.2s ease, filter 0.2s ease;
-}
-html {
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-}
     </style>
 </head>
 <body>
-    <div class="settings-popup hidden" id="settingsPopup">
-        <div class="settings-content">
-            <h3>إعدادات التخصيص</h3>
-    
-            <label for="fontFamily">خط النص:</label>
-            <select id="fontFamily" onchange="updateFontFamily(this.value)">
-                <option value="Arial">Arial</option>
-                <option value="Noto Kufi Arabic">Kufi</option>
-                <option value="Amiri">Amiri</option>
-            </select>
-<link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
-            <label for="themeSelector">المظاهر:</label>
-            <select id="themeSelector" onchange="changeTheme(this.value)">
-                <option value="root">Default</option>
-                <option value="deepdark">Deep Dark</option>
-                <option value="greendark">Green Dark</option>
-                <option value="purpledark">Purple Dark</option>
-                <option value="firefoxdark">Firefox Dark</option>
-                <option value="orangedark">Orange Dark</option>
-                <option value="arcdark">Arc Dark</option>
-                <option value="cozy-night">Cozy Night</option>
-                <option value="DesertNight">Desert Night</option>
-            </select>
-            <label for="gridSelect">التخطيط:</label>
-            <select id="gridSelect">
-        <option value="2">2x1</option>
-        <option value="3">3x1</option>
-    </select>
-
-            <button onclick="closeSettings()">إغلاق</button>
-            <button onclick="resetCustomization()">إعادة تعيين التخصيص</button>
-            <button class="export-button" onclick="exportData()">تصدير</button>
-<input type="file" id="fileInput" accept="application/json" style="display: none;" onchange="importData(event)">
-<button onclick="document.getElementById('fileInput').click()">استيراد</button>
-        </div>
-    </div>
-    
-
-    <div id="popupForm" class="popup-form" aria-hidden="true">
-        <div class="popup-content">
-            <h2>أضف موقعاً جديداً</h2>
-            <label for="popupSiteName"></label>
-            <input type="text" id="popupSiteName" placeholder="اسم الموقع" required>
-            <label for="popupSiteURL"></label>
-            <input type="url" id="popupSiteURL" placeholder="رابط الموقع" required>
-            <button onclick="addSiteFromPopup()">إضافة الموقع</button>
-            <a href="webs.html">
-                <button>
-الاعداد المسبق                </button>
-            </a>            
-        </div>
-    </div>
-    <div class="dropdown">
-    <button class="dropdown-button" onclick="toggleDropdown()">☰</button> 
-    <div class="dropdown-content" id="dropdownContent">
-    
-        <button class="add-icon" aria-label="إضافة موقع جديد"><i class="fa fa-plus"></i></button>
-        <button class="settings-button" onclick="openSettings()"><i class="fa fa-paint-brush"></i></button>
-    </div>
-</div>
-<div>
-
-</div>
-    <form id="searchForm" action="https://www.google.com/search" method="get" aria-label="شريط البحث">
-        <div id="searchBar">
-            <input type="text" name="q" placeholder="ابحث في Google" required aria-label="بحث">
-            <button type="submit" style="border: none; background: none; cursor: pointer;" aria-label="زر البحث">
-                <i class="fas fa-search" style="color: inherit;"></i>
-            </button>
-        </div>
-    </form>
-    <div class="stats-bar">
-        <div class="stat">
-            <p>إجمالي المواقع:</p>
-            <span id="totalSites">0</span>
-        </div>
-        <div class="stat">
-            <p>سجل البحث:</p>
-            <div id="recentSites" style="display: flex; gap: 5px; flex-wrap: wrap;"></div>
-        </div>        
-        <div class="stat">
-            <p>المواقع الاخيرة</p>
-            <div id="recentIcons" style="display: flex; gap: 5px;"></div>
-        </div>        
-    </div>
-    <h1>مواقعك المفضلة</h1>
-    <div class="container" id="siteContainer"></div>
-    <a href="#" id="clearData" style="position: fixed; bottom: 10px; left: 10px; color: var(--primary-color); text-decoration: underline;" aria-label="حذف البيانات">حذف البيانات</a>
-    <div id="notification" class="hidden" aria-live="polite" aria-atomic="true"></div>
-<script>
-    if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('تم تسجيل الـ Service Worker بنجاح:', registration);
-      })
-      .catch(error => {
-        console.log('فشل تسجيل الـ Service Worker:', error);
-      });
-  });
-}
-    document.addEventListener('DOMContentLoaded', () => {
-if (!localStorage.getItem("visitedBefore")) {
-    localStorage.setItem("visitedBefore", "true");
-    window.location.href = "webs.html";
-} else {
-    state.sites = JSON.parse(localStorage.getItem('sites')) || [];
-    }
-    state.gridColumns = localStorage.getItem('gridColumns') || 3;
-    state.darkMode = localStorage.getItem('darkMode') === 'enabled';
-
-    elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
-    elements.gridSelect.value = state.gridColumns;
-
-    if (state.darkMode) {
-        elements.body.classList.add('dark-mode');
-    }
-
-    loadSettings();
-    loadSites();
-    updateStats();
-    animateCards();
-    handleScrollAnimation();
-    updateSearchHistory();
-
-    elements.clearDataBtn.addEventListener('click', clearAllData);
-    elements.gridSelect.addEventListener('change', updateGridColumns);
-    document.getElementById('searchForm').addEventListener('submit', handleSearchSubmit);
-    window.addEventListener('scroll', handleScrollAnimation);
-});
-
-function clearAllData(e) {
-    e.preventDefault();
-    if (confirm("هل أنت متأكد أنك تريد حذف جميع البيانات؟")) {
-        localStorage.removeItem('sites');
-        state.sites = [];
-        loadSites();
-    }
-}
-
-function updateGridColumns(e) {
-    state.gridColumns = e.target.value;
-    elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
-    localStorage.setItem('gridColumns', state.gridColumns);
-}
-
-function handleSearchSubmit(event) {
-    event.preventDefault();
-    const searchInput = this.querySelector('input[name="q"]').value.trim();
-    if (searchInput) {
-        addSearchTerm(searchInput);
-        this.submit();
-    }
-}
-function saveDataToLocalStorage(key, data) {
-    try {
-        localStorage.setItem(key, JSON.stringify(data));
-    } catch (error) {
-        console.error("خطأ أثناء حفظ البيانات في localStorage:", error);
-    }
-}
-
-function getDataFromLocalStorage(key, defaultValue = []) {
-    try {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : defaultValue;
-    } catch (error) {
-        console.error("خطأ أثناء استرجاع البيانات من localStorage:", error);
-        return defaultValue;
-    }
-}
-
-function saveSites() {
-    saveDataToLocalStorage('sites', state.sites);
-}
-
-function loadSites() {
-    state.sites = getDataFromLocalStorage('sites');
-    elements.container.innerHTML = '';
-    state.sites.forEach((site, index) => addSiteCard(site, index));
-}
-
-function addSiteFromPopup() {
-    const siteName = elements.popupSiteName.value.trim();
-    const siteURL = elements.popupSiteURL.value.trim();
-    if (!siteName || !siteURL) return;
-
-    const newSite = { name: siteName, url: siteURL, visits: 0 };
-    state.sites.push(newSite);
-    saveSites();
-    addSiteCard(newSite, state.sites.length - 1);
-    elements.popupSiteName.value = '';
-    elements.popupSiteURL.value = '';
-    hidePopup();
-    updateStats();
-    showNotification("تم إضافة الموقع بنجاح!");
-}
-function animateCards() {
-    const cards = document.querySelectorAll('.site-card');
-    cards.forEach((card, index) => {
-        setTimeout(() => card.classList.add('visible'), index * 100);
-    });
-}
-function handleScrollAnimation() {
-    const cards = document.querySelectorAll('.site-card');
-    const windowHeight = window.innerHeight;
-
-    cards.forEach(card => {
-        const cardTop = card.getBoundingClientRect().top;
-        if (cardTop < windowHeight - 50) {
-            card.classList.add('in-view');
-        }
-    });
-}
-function showPopup() {
-    elements.popupForm.classList.add('show');
-    elements.popupForm.style.display = 'flex';
-}
-
-function hidePopup() {
-    elements.popupForm.classList.remove('show');
-    setTimeout(() => {
-        elements.popupForm.style.display = 'none';
-    }, 300);
-}
-
-    const state = {
-        sites: [],
-        darkMode: false,
-        gridColumns: 2
-    };
-
-    const elements = {
-        body: document.body,
-        container: document.getElementById('siteContainer'),
-        popupForm: document.getElementById('popupForm'),
-        popupSiteName: document.getElementById('popupSiteName'),
-        popupSiteURL: document.getElementById('popupSiteURL'),
-        gridSelect: document.getElementById('gridSelect'),
-        clearDataBtn: document.getElementById('clearData'),
-        notification: document.getElementById('notification'),
-        totalSites: document.getElementById('totalSites'),
-        recentSites: document.getElementById('recentSites'),
-        mostVisitedSite: document.getElementById('mostVisitedSite')
-    };
-    
-    
-
-    document.addEventListener('click', (e) => {
-        const target = e.target;
-        
-        if (target.closest('.add-icon')) {
-            showPopup();
-        } else if (target === elements.popupForm) {
-            hidePopup();
-        } else if (target.closest('.icon-button')) {
-            const button = target.closest('.icon-button');
-            const card = button.closest('.site-card');
-            const index = Array.from(elements.container.children).indexOf(card);
+    <div class="settings-container">
+        <div class="settings-card">
+            <h1 style="text-align: center; margin-bottom: 30px;">الإعدادات المتقدمة</h1>
             
-            if (button.querySelector('.fa-trash')) {
-                deleteSite(index);
-            } else if (button.querySelector('.fa-edit')) {
-                const fileInput = document.getElementById(`fileInput${index}`);
-                fileInput?.click();
-            }
-        }
-    });
-
-function deleteSite(index) {
-
-    if (index < 0 || index >= state.sites.length) {
-        console.error("فهرس غير صالح للحذف:", index);
-        return;
-    }
-
-    if (confirm("هل أنت متأكد أنك تريد حذف هذا الموقع؟")) {
-        
-        state.sites.splice(index, 1);
-
-        localStorage.setItem('sites', JSON.stringify(state.sites));
-
-        loadSites();
-
-        updateStats();
-    }
-}
-
-    function addSiteCard(site, index) {
-        const siteCard = document.createElement('div');
-        siteCard.className = 'site-card';
-
-        const imageSrc = site.image || `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${site.url}&size=64`;        siteCard.innerHTML = `
-            <div class="icon-buttons">
-                <button class="icon-button" onclick="incrementVisits(${index})"><i class="fas fa-edit"></i></button>
-                <input type="file" id="fileInput${index}" style="display: none;" accept="image/*" onchange="updateImage(${index}, event)">
-                <button class="icon-button" onclick="deleteSite(${index})"><i class="fas fa-trash"></i></button>
+            <div class="button-group">
+                <button class="action-button" onclick="exportData()">
+                    <i class="fas fa-file-export"></i>
+                    تصدير البيانات
+                </button>
+                
+                <button class="action-button" onclick="window.location.href='https://sitescard.pages.dev'">
+                    <i class="fas fa-external-link-alt"></i>
+                    الانتقال للصفحة الجديدة
+                </button>
             </div>
-            <a href="${site.url}" target="_blank" onclick="incrementVisits(${index})">
-                <img id="siteImage${index}" src="${imageSrc}" alt="${site.name}" loading="lazy">
-                <p>${site.name}</p>
-            </a>
-        `;
+        </div>
+    </div>
 
-        elements.container.appendChild(siteCard);
-    }
-
-    function toggleDropdown() {
-        const dropdownContent = document.getElementById('dropdownContent');
-        dropdownContent.classList.toggle('open');
-    }
-
-    function updateImage(index, event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            state.sites[index].image = e.target.result;
-            localStorage.setItem('sites', JSON.stringify(state.sites));
-            document.getElementById(`siteImage${index}`).src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    elements.gridSelect.addEventListener('change', (e) => {
-        state.gridColumns = e.target.value;
-        elements.container.style.gridTemplateColumns = `repeat(${state.gridColumns}, 1fr)`;
-        localStorage.setItem('gridColumns', state.gridColumns);
-    });
-
-    elements.clearDataBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (confirm("هل أنت متأكد أنك تريد حذف جميع البيانات؟")) {
-            localStorage.removeItem('sites');
-            state.sites = [];
-            loadSites();
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && elements.popupForm.style.display === 'flex') {
-            hidePopup();
-        }
-    });
-    document.getElementById('popupSiteURL').addEventListener('blur', function(e) {
-    if (!this.value.startsWith('http')) {
-        this.value = 'https://' + this.value;
-    }
-});
-    function updateStats() {
-    const totalSites = state.sites.length;
-    elements.totalSites.textContent = totalSites;
-
-    const recentIconsContainer = document.getElementById('recentIcons');
-    recentIconsContainer.innerHTML = '';
-
-    const visitedSites = JSON.parse(localStorage.getItem('visitedSites')) || [];
-    const recentSites = [...new Set(visitedSites.slice(-3).reverse())];
-    recentSites.forEach(siteUrl => {
-        const site = state.sites.find(s => s.url === siteUrl);
-        const siteImage = site && site.image ? site.image : `https://www.google.com/s2/favicons?sz=32&domain=${new URL(siteUrl).hostname}`;
-
-        try {
-            const icon = document.createElement('a');
-            icon.href = siteUrl;
-            icon.target = "_blank";
-            icon.style.display = "inline-block";
-            icon.style.margin = "0 5px";
-
-            const img = document.createElement('img');
-            img.src = siteImage;
-            img.alt = "Icon";
-            img.style.width = "24px";
-            img.style.height = "24px";
-            img.style.borderRadius = "50%";
-
-            icon.appendChild(img);
-            recentIconsContainer.appendChild(icon);
-        } catch (error) {
-            console.error("Invalid URL:", siteUrl);
-        }
-    });
-
-    const recentSearchesContainer = elements.recentSites;
-    recentSearchesContainer.innerHTML = '';
-
-    const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-    const recentSearchTerms = [...new Set(searchHistory.slice(-5).reverse())];
-    recentSearchTerms.forEach(searchTerm => {
-        const searchLink = document.createElement('a');
-        searchLink.href = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
-        searchLink.textContent = searchTerm;
-        searchLink.style.margin = "0 5px";
-        searchLink.style.cursor = "pointer";
-        searchLink.target = "_blank";
-        recentSearchesContainer.appendChild(searchLink);
-    });
-}
-
-function incrementVisits(index) {
-    const site = state.sites[index];
-    if (site) {
-        let visitedSites = JSON.parse(localStorage.getItem('visitedSites')) || [];
-
-        visitedSites = visitedSites.filter(url => url !== site.url);
-        visitedSites.push(site.url);
-
-        localStorage.setItem('visitedSites', JSON.stringify(visitedSites));
-        updateStats();
-    }
-}
-
-function addSearchTerm(term) {
-    let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-
-    searchHistory = searchHistory.filter(entry => entry !== term);
-    searchHistory.push(term);
-
-    localStorage.setItem('searchHistory', JSON.stringify(searchHistory)); 
-    updateStats(); 
-}
-
-document.getElementById('searchForm').addEventListener('submit', function (event) {
-    event.preventDefault(); 
-    const searchInput = this.querySelector('input[name="q"]').value.trim();
-    if (searchInput) {
-        addSearchTerm(searchInput);
-    }
-});
-
-const defaultSettings = {
-    font: 'Arial',
-    theme: 'default',
-    layout: '3x1'
-};
-function saveSettings() {
-    const currentTheme = document.querySelector("button[data-theme].active").dataset.theme;
-    localStorage.setItem("theme", currentTheme);
-    showNotification("تم حفظ الإعدادات بنجاح!");
-}
-function saveSettings(settings) {
-    try {
-        localStorage.setItem('userSettings', JSON.stringify(settings));
-    } catch (error) {
-        console.error("خطأ في حفظ الإعدادات:", error);
-        showNotification('حدث خطأ أثناء حفظ الإعدادات');
-    }
-}
-function updateSearchHistory() {
-    const recentSearchesContainer = document.getElementById('recentSites');
-    recentSearchesContainer.innerHTML = "";
-    
-    const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-    
-    const recentSearchTerms = [...new Set(searchHistory.slice(-3).reverse())];
-    
-    const maxLength = 10;
-    
-    recentSearchTerms.forEach(searchTerm => {
-        const displayText = searchTerm.length > maxLength 
-                            ? searchTerm.substr(0, maxLength) + "..." 
-                            : searchTerm;
-                            
-        const searchLink = document.createElement('a');
-        searchLink.href = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
-        searchLink.textContent = displayText;
-        searchLink.style.margin = "0 5px";
-        searchLink.style.cursor = "pointer";
-        searchLink.target = "_blank";
-        recentSearchesContainer.appendChild(searchLink);
-    });
-}
-function loadSettings() {
-    try {
-        const savedSettings = localStorage.getItem('userSettings');
-        const settings = savedSettings ? JSON.parse(savedSettings) : defaultSettings;
-        
-        applySettings(settings);
-    } catch (error) {
-        console.error("خطأ في تحميل الإعدادات:", error);
-        applySettings(defaultSettings);
-    }
-}
-
-function applySettings(settings) {
-    document.body.style.fontFamily = settings.font;
-    const fontSelect = document.getElementById('fontSelect');
-    if (fontSelect) fontSelect.value = settings.font;
-
-    changeTheme(settings.theme);
-    const themeSelect = document.getElementById('themeSelect');
-    if (themeSelect) themeSelect.value = settings.theme;
-
-    const layoutButtons = document.querySelectorAll('.layout-button');
-    layoutButtons.forEach(button => {
-        button.classList.toggle('active', button.dataset.layout === settings.layout);
-    });
-}
-
-function changeTheme(theme) {
-    document.body.className = theme;
-    saveSettings({
-        ...getCurrentSettings(),
-        theme: theme
-    });
-    localStorage.setItem('theme', theme);
-}
-
-function updateFontFamily(font) {
-    document.body.style.fontFamily = font;
-    saveSettings({
-        ...getCurrentSettings(),
-        font: font
-    });
-}
-
-function getCurrentSettings() {
-    return {
-        font: document.body.style.fontFamily || defaultSettings.font,
-        theme: document.body.className || defaultSettings.theme,
-        layout: document.querySelector('.layout-button.active')?.dataset.layout || defaultSettings.layout
-    };
-}
-
-function resetCustomization() {
-    applySettings(defaultSettings);
-    saveSettings(defaultSettings);
-    showNotification('تم إعادة تعيين الإعدادات');
-}
-
-function showNotification(message) {
-    const notification = document.getElementById('notification');
-    if (notification) {
-        notification.textContent = message;
-        notification.classList.remove('hidden');
-        notification.classList.add('show');
-
-        setTimeout(() => {
-            notification.classList.remove('show');
-            notification.classList.add('hidden');
-        }, 3000);
-    }
-    notification.style.right = '20px';
-notification.style.left = 'auto';
-notification.style.backgroundColor = 'var(--primary-color)';
-}
-
-function openSettings() {
-    const popup = document.getElementById('settingsPopup');
-    if (popup) popup.classList.remove('hidden');
-}
-
-function closeSettings() {
-    const popup = document.getElementById('settingsPopup');
-    if (popup) popup.classList.add('hidden');
-}
-        document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no');
+    <script>
+        // دالة التصدير المحدثة
         function exportData() {
-    const data = {
-        sites: state.sites,
-        settings: getCurrentSettings()
-    };
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "data.json");
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-}
-function importData() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/json';
-    input.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
             try {
-                const importedData = JSON.parse(e.target.result);
-                if (importedData.sites) {
-                    state.sites = importedData.sites;
-                    localStorage.setItem('sites', JSON.stringify(state.sites));
-                    loadSites();
-                }
-                if (importedData.settings) {
-                    applySettings(importedData.settings);
-                }
-                showNotification("تم استيراد البيانات بنجاح!");
+                const fullData = {
+                    sites: JSON.parse(localStorage.getItem('sites')) || [],
+                    settings: getCurrentSettings(),
+                    searchHistory: JSON.parse(localStorage.getItem('searchHistory')) || [],
+                    visitedSites: JSON.parse(localStorage.getItem('visitedSites')) || []
+                };
+
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+                const filename = `sites-backup-${timestamp}.json`;
+                
+                const dataStr = "data:text/json;charset=utf-8," + 
+                    encodeURIComponent(JSON.stringify(fullData, null, 2));
+                
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.href = dataStr;
+                downloadAnchor.download = filename;
+                downloadAnchor.style.display = 'none';
+                
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(downloadAnchor);
+                    alert("تم تصدير النسخة الاحتياطية بنجاح ✅");
+                }, 100);
             } catch (error) {
-                showNotification("فشل استيراد البيانات! يرجى التأكد من صحة الملف.");
+                console.error('Export error:', error);
+                alert("⚠️ حدث خطأ أثناء التصدير!");
             }
-        };
-        reader.readAsText(file);
-    });
-    input.click();
-}
-document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("siteContainer");
-    let editMode = false;
-    let touchTimer;
-    const longPressDuration = 500;
-    const moveThreshold = 10;   
-    let startX = 0, startY = 0;
-    let moved = false;
-    let sortable;
-
-    function initializeSortable() {
-    if (sortable) sortable.destroy();
-    sortable = new Sortable(container, {
-        animation: 150,
-        ghostClass: "sortable-ghost",
-        dragClass: "dragging",
-        preventOnFilter: false,
-        disabled: !editMode,
-        fallbackOnBody: true,
-        scroll: true,
-        onStart: function (evt) {
-            evt.item.classList.add("dragging");
-        },
-        onEnd: function (evt) {
-            evt.item.classList.remove("dragging");
-            saveNewOrder();
         }
-    });
-}
 
-    function saveNewOrder() {
-        const newOrder = Array.from(container.children).map(child => {
-            const p = child.querySelector("p");
-            if (!p) return null;
-            const siteName = p.textContent;
-            return state.sites.find(site => site.name === siteName);
-        }).filter(site => site);
-        state.sites = newOrder;
-        saveSites();
-    }
-
-    container.addEventListener("touchstart", (e) => {
-        if (e.touches.length !== 1) return;
-        moved = false;
-        startX = e.touches[0].pageX;
-        startY = e.touches[0].pageY;
-        touchTimer = setTimeout(() => {
-            if (!moved) {
-                enableEditMode();
-            }
-        }, longPressDuration);
-    });
-
-    container.addEventListener("touchmove", (e) => {
-        const dx = e.touches[0].pageX - startX;
-        const dy = e.touches[0].pageY - startY;
-        if (Math.sqrt(dx * dx + dy * dy) > moveThreshold) {
-            moved = true;
-            clearTimeout(touchTimer);
+        // دالة الحصول على الإعدادات الحالية
+        function getCurrentSettings() {
+            return {
+                theme: localStorage.getItem('theme') || 'default',
+                layout: localStorage.getItem('gridColumns') || '3',
+                font: document.body.style.fontFamily || 'Arial'
+            };
         }
-    });
-
-    container.addEventListener("touchend", () => {
-        clearTimeout(touchTimer);
-    });
-
-    container.addEventListener("mousedown", (e) => {
-        moved = false;
-        startX = e.pageX;
-        startY = e.pageY;
-        touchTimer = setTimeout(() => {
-            if (!moved) {
-                enableEditMode();
-            }
-        }, longPressDuration);
-    });
-
-    container.addEventListener("mousemove", (e) => {
-        if (!touchTimer) return;
-        const dx = e.pageX - startX;
-        const dy = e.pageY - startY;
-        if (Math.sqrt(dx * dx + dy * dy) > moveThreshold) {
-            moved = true;
-            clearTimeout(touchTimer);
-        }
-    });
-
-    container.addEventListener("mouseup", () => {
-        clearTimeout(touchTimer);
-    });
-
-    function enableEditMode() {
-        if (editMode) return;
-        editMode = true;
-        document.body.classList.add("edit-mode");
-
-        document.querySelectorAll(".site-card").forEach(card => {
-            card.classList.add("editing-effect");
-            card.querySelectorAll(".icon-button").forEach(btn => {
-                btn.style.display = "inline-block";
-            });
-        });
-
-        initializeSortable();
-        showDoneButton();
-    }
-
-    function disableEditMode() {
-        editMode = false;
-        document.body.classList.remove("edit-mode");
-
-        document.querySelectorAll(".site-card").forEach(card => {
-            card.classList.remove("editing-effect");
-            card.querySelectorAll(".icon-button").forEach(btn => {
-                btn.style.display = "none";
-            });
-        });
-
-        initializeSortable();
-        hideDoneButton();
-    }
-
-    function showDoneButton() {
-        let doneButton = document.getElementById("doneButton");
-        if (!doneButton) {
-            doneButton = document.createElement("button");
-            doneButton.id = "doneButton";
-            doneButton.textContent = "تم";
-            doneButton.style.position = "fixed";
-            doneButton.style.top = "10px";
-            doneButton.style.right = "10px";
-            doneButton.style.padding = "10px 15px";
-            doneButton.style.fontSize = "16px";
-            doneButton.style.background = "#2e2e2e";
-            doneButton.style.color = "white";
-            doneButton.style.border = "none";
-            doneButton.style.borderRadius = "5px";
-            doneButton.style.cursor = "pointer";
-            document.body.appendChild(doneButton);
-            doneButton.addEventListener("click", disableEditMode);
-        }
-    }
-
-    function hideDoneButton() {
-        const doneButton = document.getElementById("doneButton");
-        if (doneButton) {
-            doneButton.remove();
-        }
-    }
-
-    initializeSortable();
-    document.querySelectorAll(".icon-button").forEach(btn => {
-        btn.style.display = "none";
-    });
-});
-document.addEventListener("DOMContentLoaded", () => {
-      const savedTheme = localStorage.getItem("theme") || "Default";
-      document.body.className = savedTheme;
-      document.getElementById("theme").value = savedTheme;
-    });
-
-    document.getElementById("theme").addEventListener("change", (event) => {
-      const selectedTheme = event.target.value;
-      document.body.className = selectedTheme;
-      localStorage.setItem("theme", selectedTheme);
-    });
-</script>
+    </script>
+    
+    <!-- Font Awesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </body>
 </html>
